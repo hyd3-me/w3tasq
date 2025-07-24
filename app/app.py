@@ -1,11 +1,17 @@
 # app/app.py
-from flask import Flask
+from flask import Flask, render_template
 
-app = Flask(__name__)
+def create_app():
+    """Фабричная функция для создания экземпляра приложения"""
+    app = Flask(__name__)
+    
+    @app.route('/')
+    def hello_world():
+        return render_template('index.html')
+    
+    return app
 
-@app.route('/')
-def hello_world():
-    return 'Привет'
-
+# Для запуска в production
 if __name__ == '__main__':
-    app.run()
+    app = create_app()
+    app.run(debug=True)
