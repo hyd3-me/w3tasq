@@ -46,6 +46,36 @@ def create_app():
         except Exception as e:
             return jsonify({'error': 'Internal server error'}), 500
     
+    @app.route('/api/auth/verify', methods=['POST'])
+    def verify_signature():
+        """Verify the signature provided by the client"""
+        try:
+            data = request.get_json()
+            address = data.get('address')
+            signature = data.get('signature')
+            
+            if not address or not signature:
+                return jsonify({'error': 'Address and signature are required'}), 400
+            
+            # Verify signature using existing utils function
+            is_valid, message = utils.verify_signature(address, signature)
+            
+            if is_valid:
+                # Store user in session
+                session['user_address'] = address
+                session['authenticated'] = True
+                
+                return jsonify({
+                    'success': True,
+                    'address': address,
+                    'message': message
+                })
+            else:
+                return jsonify({'error': message}), 401
+                
+        except Exception as e:
+            return jsonify({'error': 'Internal server error'}), 500
+    
     return app
 
 # Для запуска в production

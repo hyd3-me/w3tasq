@@ -44,16 +44,32 @@ def generate_challenge_message(address):
 def get_test_w3addres():
     return private_data.TEST_ADDR1
 
-def verify_signature(address, signature, message):
+def verify_signature(address, signature):
     """
     Verify that the signature corresponds to the address for the given message
     """
     try:
+        # Normalize address
+        normalized_address = Web3.to_checksum_address(address)
+        
+        # Check if challenge exists for this address
+        if normalized_address not in CHALLENGES:
+            return False, "No challenge found for this address"
+        
+        # Get stored challenge
+        stored_challenge = CHALLENGES[normalized_address]
+        
+        # Check if challenge has expired
+        if datetime.utcnow() > stored_challenge['expires_at']:
+            # Remove expired challenge
+            del CHALLENGES[normalized_address]
+            return False, "Challenge has expired"
+        
         # Create Web3 instance
         w3 = Web3()
         
         # Encode message properly for Ethereum signing
-        message_hash = encode_defunct(text=message)
+        message_hash = encode_defunct(text=stored_challenge['message'])
         
         # Recover address from signature
         recovered_address = w3.eth.account.recover_message(
@@ -62,10 +78,16 @@ def verify_signature(address, signature, message):
         )
         
         # Verify addresses match
-        return Web3.to_checksum_address(recovered_address) == Web3.to_checksum_address(address)
+        is_valid = Web3.to_checksum_address(recovered_address) == normalized_address
+        
+        # If valid, remove used challenge
+        if is_valid:
+            del CHALLENGES[normalized_address]
+            
+        return is_valid, "Signature verified successfully" if is_valid else "Signature does not match the address"
+    
     except Exception as e:
-        print(f"Verification error: {e}")
-        return False
+        return False, f"Verification error: {str(e)}"
 
 def sign_message_with_private_key(message):
     """

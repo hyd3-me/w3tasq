@@ -46,16 +46,16 @@ def test_signature_verification_valid():
     signature = utils.sign_message_with_private_key(message)
     
     # Verify the signature
-    result = utils.verify_signature(address, f"0x{signature}", message)
+    result, msg = utils.verify_signature(address, f"0x{signature}")
     assert result is True
 
 def test_signature_verification_invalid():
     """Test: invalid signature should not pass verification"""
-    message = "Sign this message to authenticate: abc123"
     address = "0x742d35Cc6634C0532925a3b8D4C7d26990d0f7f6"
     signature = "0xinvalidsignature"
+    message = utils.generate_challenge_message(address)
     
-    result = utils.verify_signature(address, signature, message)
+    result, msg = utils.verify_signature(address, signature)
     assert result is False
 
 def test_unauthenticated_user_redirected_to_login(client):
@@ -113,3 +113,31 @@ def test_challenge_generation_with_invalid_address(client):
     # Проверяем сообщение об ошибке
     assert 'error' in data
     assert 'Invalid Ethereum address' in data['error']
+
+def test_signature_verification_endpoint_success(client):
+    """Test: POST /api/auth/verify should verify valid signature and create session"""
+    # Сначала генерируем challenge (симулируем первый шаг)
+
+    test_address = utils.get_test_w3addres()
+    message = utils.generate_challenge_message(test_address)
+    
+    # Создаем подпись (в реальном сценарии это делает клиент)
+    signature = utils.sign_message_with_private_key(message)
+    
+    # Отправляем запрос на верификацию
+    response = client.post('/api/auth/verify', 
+                          json={
+                              'address': test_address,
+                              'signature': f"0x{signature}"
+                          })
+    
+    # Проверяем успешный ответ
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data['success'] is True
+    assert data['address'] == test_address
+    
+    # Проверяем, что сессия создана
+    with client.session_transaction() as session:
+        assert session['user_address'] == test_address
+        assert session['authenticated'] is True
