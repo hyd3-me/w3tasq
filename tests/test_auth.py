@@ -197,3 +197,19 @@ def test_logout_endpoint_clears_session(client):
     with client.session_transaction() as session:
         assert 'user_address' not in session
         assert session.get('authenticated') is not True
+
+def test_dashboard_page_contains_logout_button(client):
+    """Test: dashboard page should contain logout button for authenticated user"""
+    # Аутентифицируем пользователя
+    with client.session_transaction() as session:
+        session['user_address'] = '0x742d35Cc6634C0532925a3b8D4C7d26990d0f7f6'
+        session['authenticated'] = True
+    
+    # Получаем главную страницу (дашборд)
+    response = client.get('/')
+    assert response.status_code == 200
+    
+    # Проверяем, что страница содержит кнопку logout
+    html_content = response.data.decode('utf-8')
+    assert 'logout' in html_content.lower()
+    assert 'logoutForm' in html_content
