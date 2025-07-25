@@ -1,5 +1,5 @@
 # app/app.py
-from flask import Flask, render_template
+from flask import Flask, render_template, session, redirect, url_for
 from app import utils
 
 
@@ -11,8 +11,13 @@ def create_app():
     app.secret_key = utils.get_secret_key()
     
     @app.route('/')
-    def hello_world():
-        return render_template('index.html')
+    def index():
+        # Проверяем, авторизован ли пользователь
+        if 'user_address' in session and session.get('authenticated'):
+            return render_template('index.html', user_address=session.get('user_address'))
+        else:
+            # Настоящий HTTP редирект на страницу логина
+            return redirect(url_for('login'))
     
     @app.route('/login')
     def login():

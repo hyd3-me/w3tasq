@@ -34,7 +34,6 @@ def test_user_session_authentication(client):
         assert session['user_address'] == '0x742d35Cc6634C0532925a3b8D4C7d26990d0f7f6'
         assert session.get('authenticated') is True
 
-
 def test_signature_verification_valid():
     """Test: valid signature should pass verification"""
     # Generate message as server would do
@@ -58,3 +57,15 @@ def test_signature_verification_invalid():
     
     result = utils.verify_signature(address, signature, message)
     assert result is False
+
+def test_unauthenticated_user_redirected_to_login(client):
+    """Test: unauthenticated user should be redirected to login page"""
+    # Отправляем запрос к главной странице без аутентификации
+    response = client.get('/', follow_redirects=False)  # Не следуем редиректу
+    
+    # Проверяем, что был возвращен код редиректа
+    assert response.status_code == 302
+    
+    # Проверяем, что редирект ведет на страницу логина
+    assert 'Location' in response.headers
+    assert '/login' in response.headers['Location']
