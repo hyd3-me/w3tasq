@@ -9,9 +9,104 @@
 <body>
     <div class="container">
         <h1>Connect with Web3 Wallet</h1>
-        <p>Please connect your Ethereum wallet to continue.</p>
+        
         <button id="connectWallet">Connect Wallet</button>
         <div id="status"></div>
     </div>
+
+    <!-- Load ethers.js for web3 functionality -->
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+    
+    <script>
+        // Check if MetaMask is available
+        function checkWalletConnection() {
+            const statusElement = document.getElementById('status');
+            
+            if (typeof window.ethereum === 'undefined') {
+                statusElement.innerHTML = '<p style="color: red;">MetaMask is not installed. Please install it to continue.</p>';
+                return false;
+            }
+            
+            statusElement.innerHTML = '<p style="color: green;">MetaMask detected! Ready to connect.</p>';
+            return true;
+        }
+        
+        // Connect to wallet
+        async function connectWallet() {
+            const statusElement = document.getElementById('status');
+            statusElement.innerHTML = '<p>Connecting to wallet...</p>';
+            
+            try {
+                // Request account access
+                const accounts = await window.ethereum.request({ 
+                    method: 'eth_requestAccounts' 
+                });
+                
+                const address = accounts[0];
+                statusElement.innerHTML = `<p>Connected: ${address}</p>`;
+                
+                // Get challenge from server
+                const challengeResponse = await fetch('/api/auth/challenge', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ address: address })
+                });
+                
+                const challengeData = await challengeResponse.json();
+                
+                if (!challengeData.success) {
+                    throw new Error(challengeData.error || 'Failed to get challenge');
+                }
+                
+                const message = challengeData.message;
+                
+                // Sign the message with the wallet
+                const signature = await window.ethereum.request({
+                    method: 'personal_sign',
+                    params: [message, address]
+                });
+                
+                // Verify signature with server
+                const verifyResponse = await fetch('/api/auth/verify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        address: address,
+                        signature: signature
+                    })
+                });
+                
+                const verifyData = await verifyResponse.json();
+                
+                if (verifyData.success) {
+                    statusElement.innerHTML += '<p style="color: green;">✅ Authentication successful!</p>';
+                    // Redirect to main page
+                    window.location.href = '/';
+                } else {
+                    statusElement.innerHTML += `<p style="color: red;">❌ ${verifyData.error}</p>`;
+                }
+                
+            } catch (error) {
+                statusElement.innerHTML += `<p style="color: red;">❌ ${error.message}</p>`;
+            }
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            const connectButton = document.getElementById('connectWallet');
+            
+            // Check wallet connection on page load
+            checkWalletConnection();
+            
+            // Set up button click handler
+            if (connectButton) {
+                connectButton.addEventListener('click', connectWallet);
+            }
+        });
+    </script>
 </body>
 </html>
