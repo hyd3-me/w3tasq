@@ -14,11 +14,18 @@ def client():
         yield client
 
 def test_index_page(client):
-    """Тест: главная страница должна возвращать 'Привет'"""
-    # Отправляем GET-запрос к главной странице
+    """Test: home page should show dashboard for authenticated user"""
+    # Authenticate user by adding to session
+    with client.session_transaction() as session:
+        session['user_address'] = '0x742d35Cc6634C0532925a3b8D4C7d26990d0f7f6'
+        session['authenticated'] = True
+
+    # Now request home page
     response = client.get('/')
-    # Проверяем статус код
+    # Should show dashboard (200 OK)
     assert response.status_code == 200
+    # Should return HTML
+    assert 'text/html' in response.content_type
 
 def test_login_page_is_accessible(client):
     """Тест: страница логина должна быть доступна"""
