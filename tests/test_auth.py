@@ -82,3 +82,18 @@ def test_challenge_generation_endpoint(client):
     assert 'message' in data
     assert isinstance(data['message'], str)
     assert len(data['message']) > 0
+
+def test_challenge_generation_without_address(client):
+    """Test: POST /api/auth/challenge without address should return error"""
+    # Отправляем POST запрос без адреса
+    response = client.post('/api/auth/challenge', json={})
+    
+    # Проверяем, что получили ошибку
+    assert response.status_code == 400
+    
+    # Парсим JSON ответ
+    data = response.get_json()
+    
+    # Проверяем сообщение об ошибке
+    assert 'error' in data
+    assert 'Address is required' in data['error']
