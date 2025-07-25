@@ -171,3 +171,29 @@ def test_login_page_contains_web3_elements(client):
     
     # Проверяем наличие ссылки на ethers.js
     assert 'ethers.io' in html_content or 'ethers' in html_content
+
+def test_logout_endpoint_clears_session(client):
+    """Test: POST /api/auth/logout should clear user session"""
+    # Сначала аутентифицируем пользователя
+    with client.session_transaction() as session:
+        session['user_address'] = '0x742d35Cc6634C0532925a3b8D4C7d26990d0f7f6'
+        session['authenticated'] = True
+    
+    # Проверяем, что пользователь авторизован
+    with client.session_transaction() as session:
+        assert 'user_address' in session
+        assert session['authenticated'] is True
+    
+    # Отправляем запрос на logout
+    response = client.post('/api/auth/logout')
+    
+    # Проверяем успешный ответ
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data['success'] is True
+    assert 'message' in data
+    
+    # Проверяем, что сессия очищена
+    with client.session_transaction() as session:
+        assert 'user_address' not in session
+        assert session.get('authenticated') is not True

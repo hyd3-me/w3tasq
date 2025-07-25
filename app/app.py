@@ -23,6 +23,12 @@ def create_app():
     def login():
         return render_template('login.html')
     
+    @app.route('/api/auth/logout', methods=['POST'])
+    def logout():
+        """Clear authentication session"""
+        session.clear()
+        return jsonify({'success': True, 'message': 'Logged out successfully'})
+    
     @app.route('/api/auth/challenge', methods=['POST'])
     def get_challenge():
         """Generate a challenge message for the given address"""
