@@ -68,3 +68,18 @@ def sign_message_with_private_key(message):
     )
     
     return signed_message.signature.hex()
+
+def get_secret_key():
+    """
+    Get secret key from private_data or generate a temporary one
+    """
+    # Проверяем, есть ли SECRET_KEY в private_data
+    if private_data and hasattr(private_data, 'SECRET_KEY'):
+        secret_key = private_data.SECRET_KEY
+        # Проверяем, не является ли это placeholder значением
+        if secret_key and not secret_key.startswith('your-super-secret'):
+            return secret_key
+    
+    # Для разработки генерируем временный ключ
+    print("WARNING: Using temporary secret key. For production, set SECRET_KEY in private_data.py")
+    return secrets.token_urlsafe(32)

@@ -1,9 +1,14 @@
 # app/app.py
 from flask import Flask, render_template
+from app import utils
+
 
 def create_app():
     """Фабричная функция для создания экземпляра приложения"""
     app = Flask(__name__)
+    
+    # Configure secret key for sessions using utils
+    app.secret_key = utils.get_secret_key()
     
     @app.route('/')
     def hello_world():
