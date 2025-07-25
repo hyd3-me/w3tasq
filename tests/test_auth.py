@@ -97,3 +97,19 @@ def test_challenge_generation_without_address(client):
     # Проверяем сообщение об ошибке
     assert 'error' in data
     assert 'Address is required' in data['error']
+
+def test_challenge_generation_with_invalid_address(client):
+    """Test: POST /api/auth/challenge with invalid address should return error"""
+    # Отправляем POST запрос с невалидным адресом
+    response = client.post('/api/auth/challenge', 
+                          json={'address': 'invalid-address'})
+    
+    # Проверяем, что получили ошибку
+    assert response.status_code == 400
+    
+    # Парсим JSON ответ
+    data = response.get_json()
+    
+    # Проверяем сообщение об ошибке
+    assert 'error' in data
+    assert 'Invalid Ethereum address' in data['error']
