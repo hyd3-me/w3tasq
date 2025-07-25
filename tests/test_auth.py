@@ -198,6 +198,28 @@ def test_logout_endpoint_clears_session(client):
         assert 'user_address' not in session
         assert session.get('authenticated') is not True
 
+def test_logout_redirects_to_login_page(client):
+    """Test: logout should redirect user to login page"""
+    # Аутентифицируем пользователя
+    with client.session_transaction() as session:
+        session['user_address'] = '0x742d35Cc6634C0532925a3b8D4C7d26990d0f7f6'
+        session['authenticated'] = True
+    
+    # Отправляем запрос на logout
+    response = client.post('/api/auth/logout', follow_redirects=False)
+    
+    # Проверяем, что logout успешен
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data['success'] is True
+    
+    # Проверяем, что пользователь больше не авторизован
+    # Отправляем запрос к главной странице
+    home_response = client.get('/', follow_redirects=False)
+    
+    # Должен быть HTTP редирект на страницу логина
+    assert home_response.status_code == 302
+
 def test_dashboard_page_contains_logout_button(client):
     """Test: dashboard page should contain logout button for authenticated user"""
     # Аутентифицируем пользователя
