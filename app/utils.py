@@ -1,6 +1,6 @@
 # app/utils.py
 import secrets
-from datetime import datetime
+from datetime import datetime, timedelta
 from web3 import Web3
 from eth_account.messages import encode_defunct
 import os, sys
@@ -9,16 +9,37 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')
 
 import private_data
 
-def generate_challenge_message():
+
+# Временное хранилище для challenge (в production лучше использовать Redis)
+CHALLENGES = {}
+
+def generate_challenge_message(address):
     """
-    Generate a unique challenge message for authentication
+    Generate a unique challenge message for the given address
     This simulates what the server sends to the client
     """
-    # Generate a random challenge
+    # Validate address format
+    if not Web3.is_address(address):
+        raise ValueError("Invalid Ethereum address format")
+    
+    # Normalize address
+    normalized_address = Web3.to_checksum_address(address)
+    
+    # Generate unique challenge
     challenge = secrets.token_hex(16)
-    # Include timestamp for freshness
     timestamp = datetime.utcnow().isoformat()
-    return f"Sign this message to authenticate: {challenge} at {timestamp}"
+    
+    # Create message for signing
+    message = f"Sign this message to authenticate: {challenge} at {timestamp}"
+    
+    # Store challenge with expiration (5 minutes)
+    CHALLENGES[normalized_address] = {
+        'challenge': challenge,
+        'message': message,
+        'expires_at': datetime.utcnow() + timedelta(minutes=5)
+    }
+    
+    return message
 
 def get_test_w3addres():
     return private_data.TEST_ADDR1

@@ -36,14 +36,14 @@ def test_user_session_authentication(client):
 
 def test_signature_verification_valid():
     """Test: valid signature should pass verification"""
+    # Server verifies using address, signature and original message
+    address = utils.get_test_w3addres()
+    
     # Generate message as server would do
-    message = utils.generate_challenge_message()
+    message = utils.generate_challenge_message(address)
     
     # Client receives message and returns signature
     signature = utils.sign_message_with_private_key(message)
-    
-    # Server verifies using address, signature and original message
-    address = utils.get_test_w3addres()
     
     # Verify the signature
     result = utils.verify_signature(address, f"0x{signature}", message)
