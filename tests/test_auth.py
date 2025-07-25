@@ -141,3 +141,17 @@ def test_signature_verification_endpoint_success(client):
     with client.session_transaction() as session:
         assert session['user_address'] == test_address
         assert session['authenticated'] is True
+
+def test_signature_verification_endpoint_invalid_signature(client):
+    """Test: POST /api/auth/verify with invalid signature should return error"""
+    # Отправляем запрос с невалидной подписью
+    response = client.post('/api/auth/verify', 
+                          json={
+                              'address': '0x742d35Cc6634C0532925a3b8D4C7d26990d0f7f6',
+                              'signature': '0xinvalidsignature'
+                          })
+    
+    # Проверяем ошибку
+    assert response.status_code == 401
+    data = response.get_json()
+    assert 'error' in data
