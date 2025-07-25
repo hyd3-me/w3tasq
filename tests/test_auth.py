@@ -155,3 +155,19 @@ def test_signature_verification_endpoint_invalid_signature(client):
     assert response.status_code == 401
     data = response.get_json()
     assert 'error' in data
+
+def test_login_page_contains_web3_elements(client):
+    """Test: login page should contain web3 authentication elements"""
+    response = client.get('/login')
+    assert response.status_code == 200
+    
+    html_content = response.data.decode('utf-8')
+    
+    # Проверяем наличие кнопки подключения кошелька
+    assert 'connectWallet' in html_content
+    
+    # Проверяем наличие элемента для статуса
+    assert 'status' in html_content
+    
+    # Проверяем наличие ссылки на ethers.js
+    assert 'ethers.io' in html_content or 'ethers' in html_content
