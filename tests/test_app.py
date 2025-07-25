@@ -17,3 +17,10 @@ def test_index_page(client):
     response = client.get('/')
     # Проверяем статус код
     assert response.status_code == 200
+
+def test_login_page_is_accessible(client):
+    """Тест: страница логина должна быть доступна"""
+    response = client.get('/login')
+    assert response.status_code == 200
+    # Проверяем, что это HTML
+    assert 'text/html' in response.content_type
