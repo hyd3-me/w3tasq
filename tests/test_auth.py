@@ -69,3 +69,16 @@ def test_unauthenticated_user_redirected_to_login(client):
     # Проверяем, что редирект ведет на страницу логина
     assert 'Location' in response.headers
     assert '/login' in response.headers['Location']
+
+# tests/test_auth.py (добавить)
+def test_challenge_generation_endpoint(client):
+    """Test: POST /api/auth/challenge should generate challenge message"""
+    response = client.post('/api/auth/challenge', 
+                          json={'address': '0x742d35Cc6634C0532925a3b8D4C7d26990d0f7f6'})
+    
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data['success'] is True
+    assert 'message' in data
+    assert isinstance(data['message'], str)
+    assert len(data['message']) > 0
