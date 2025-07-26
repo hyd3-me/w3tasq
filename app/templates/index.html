@@ -1,0 +1,48 @@
+<!-- templates/index.html (обновить) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Web3 Wallet Auth</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to Task & Note Tracker!</h1>
+        {% if user_address %}
+            <p>You are logged in with wallet: {{ user_address }}</p>
+            <form id="logoutForm">
+                <button type="submit">Logout</button>
+            </form>
+        {% else %}
+            <p><a href="/login">Please login to continue</a></p>
+        {% endif %}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoutForm = document.getElementById('logoutForm');
+            if (logoutForm) {
+                logoutForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    try {
+                        const response = await fetch('/api/auth/logout', {
+                            method: 'POST'
+                        });
+                        
+                        if (response.ok) {
+                            // Перенаправляем на страницу логина
+                            window.location.href = '/login';
+                        } else {
+                            console.error('Logout failed');
+                        }
+                    } catch (error) {
+                        console.error('Logout error:', error);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
