@@ -126,3 +126,13 @@ def get_secret_key():
     # Для разработки генерируем временный ключ
     print("WARNING: Using temporary secret key. For production, set SECRET_KEY in private_data.py")
     return secrets.token_urlsafe(32)
+
+def get_database_path():
+    """
+    Get database file path outside of repository
+    Returns path to tasks_notes.db file one level above project directory
+    """
+    return os.path.join(
+        # Get project root directory (where app folder is located)
+        os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+        'tasks_notes.db')
