@@ -26,7 +26,7 @@ class User(db.Model):
     wallet_address = db.Column(db.String(42), nullable=False)
     
     # Username - required
-    username = db.Column(db.String(80), nullable=False)
+    username = db.Column(db.String(80), nullable=True)
     
     # User status
     is_active = db.Column(db.Boolean, default=True, nullable=False)
