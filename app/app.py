@@ -1,6 +1,6 @@
 # app/app.py
 from flask import Flask, render_template, session, redirect, url_for, request, jsonify
-from app import utils
+from app import utils, db_utils
 from app.models import db
 
 
@@ -86,6 +86,9 @@ def create_app(config_name='default'):
             is_valid, message = utils.verify_signature(address, signature)
             
             if is_valid:
+
+                user_db, was_created = db_utils.get_or_create_user(address)
+
                 # Store user in session
                 session['user_address'] = address
                 session['authenticated'] = True
