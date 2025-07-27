@@ -105,5 +105,5 @@ def create_app(config_name='default'):
 
 # Для запуска в production
 if __name__ == '__main__':
-    app = create_app()
+    app = create_app(config_name='testing')
     app.run(debug=True)

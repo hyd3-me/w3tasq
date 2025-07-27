@@ -7,8 +7,7 @@ from app import utils
 @pytest.fixture
 def client():
     """Фикстура для создания тестового клиента"""
-    app = create_app()
-    app.config['TESTING'] = True
+    app = create_app(config_name='testing')
     
     with app.test_client() as client:
         yield client
@@ -36,7 +35,7 @@ def test_login_page_is_accessible(client):
 
 def test_app_has_secret_key_for_sessions():
     """Test: Flask app should have secret key configured for sessions"""
-    app = create_app()
+    app = create_app(config_name='testing')
     assert app.secret_key is not None
     assert isinstance(app.secret_key, str)
     assert len(app.secret_key) > 0
