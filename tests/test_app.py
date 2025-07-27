@@ -7,8 +7,8 @@ from app import utils
 @pytest.fixture
 def client():
     """Фикстура для создания тестового клиента"""
-    app.config['TESTING'] = True
     app = create_app()
+    app.config['TESTING'] = True
     
     with app.test_client() as client:
         yield client
