@@ -1,21 +1,25 @@
 # app/app.py
 from flask import Flask, render_template, session, redirect, url_for, request, jsonify
-from flask_sqlalchemy import SQLAlchemy
 from app import utils
+from app.models import db
 
 
-db = SQLAlchemy()
-
-def create_app():
+def create_app(config_name='default'):
     """Фабричная функция для создания экземпляра приложения"""
     app = Flask(__name__)
     
     # Configure secret key for sessions using utils
     app.secret_key = utils.get_secret_key()
 
+    # Configuration
+    if config_name == 'testing':
+        app.config['TESTING'] = True
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+    else:
         # Configure database using path from utils
-    db_path = utils.get_database_path()
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+        db_path = utils.get_database_path()
+        app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
     # Initialize extensions

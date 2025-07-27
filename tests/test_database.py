@@ -2,8 +2,22 @@
 import os
 import pytest
 from app.app import create_app
+from app.models import db
 from app import utils
 
+
+@pytest.fixture
+def db_app():
+    """
+    Test fixture providing app and db instances.
+    Uses in-memory SQLite for test isolation.
+    """
+    app = create_app(config_name='testing')
+    
+    with app.app_context():
+        db.create_all()
+        yield app, db
+        db.drop_all()
 
 def test_database_file_exists_at_path():
     """Test: database file should exist at the configured path"""
