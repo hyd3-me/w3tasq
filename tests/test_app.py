@@ -1,16 +1,7 @@
 # tests/test_app.py
 import pytest
-from app.app import create_app
 from app import utils
 
-
-@pytest.fixture
-def client():
-    """Фикстура для создания тестового клиента"""
-    app = create_app(config_name='testing')
-    
-    with app.test_client() as client:
-        yield client
 
 def test_index_page(client):
     """Test: home page should show dashboard for authenticated user"""
@@ -33,9 +24,8 @@ def test_login_page_is_accessible(client):
     # Проверяем, что это HTML
     assert 'text/html' in response.content_type
 
-def test_app_has_secret_key_for_sessions():
+def test_app_has_secret_key_for_sessions(app):
     """Test: Flask app should have secret key configured for sessions"""
-    app = create_app(config_name='testing')
     assert app.secret_key is not None
     assert isinstance(app.secret_key, str)
     assert len(app.secret_key) > 0

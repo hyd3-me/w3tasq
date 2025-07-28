@@ -26,3 +26,12 @@ def _db(app):
         yield db
         # Удаляем все таблицы после тестов
         db.drop_all()
+
+@pytest.fixture
+def client(app):
+    """
+    Flask test client for making HTTP requests.
+    Function scope - new client for each test.
+    """
+    with app.test_client() as client:
+        yield client
