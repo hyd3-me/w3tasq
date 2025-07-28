@@ -93,3 +93,21 @@ def test_index_page_contains_task_form(client):
     
     # Проверяем наличие ключевых элементов формы
     assert 'Create New Task' in html_content
+
+def test_index_page_contains_tasks_section(client):
+    """Test: authenticated user sees the tasks section on the index page."""
+    # Аутентифицируем пользователя, имитируя существующую сессию
+    with client.session_transaction() as session:
+        session['user_address'] = '0x742d35Cc6634C0532925a3b8D4C7d26990d0f7f6'
+        session['authenticated'] = True
+
+    # Запрашиваем главную страницу
+    response = client.get('/')
+    
+    # Проверяем, что страница загрузилась успешно
+    assert response.status_code == 200
+    assert 'text/html' in response.content_type
+    
+    # Проверяем, что на странице есть заголовок или упоминание задач
+    html_content = response.get_data(as_text=True)
+    assert 'your tasks' in html_content.lower()

@@ -49,3 +49,15 @@ def create_task(user_id, title, description=None, priority=3, status=0):
     db.session.commit()
     
     return task
+
+def get_user_tasks(user_id):
+    """
+    Get all tasks for a specific user.
+    Args:
+        db: SQLAlchemy database instance
+        Task: Task model class
+        user_id: ID of the user whose tasks to retrieve
+    Returns:
+        list: List of Task instances
+    """
+    return Task.query.filter_by(user_id=user_id).order_by(Task.created_at.desc()).all() # Сортировка по дате создания, новые первые
