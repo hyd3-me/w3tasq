@@ -91,6 +91,7 @@ def create_app(config_name='default'):
 
                 # Store user in session
                 session['user_address'] = address
+                session['user_id'] = user_db.id
                 session['authenticated'] = True
                 
                 return jsonify({

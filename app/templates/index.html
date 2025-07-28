@@ -24,36 +24,57 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Форма для создания новой задачи -->
         <div class="task-form">
             <h3>Create New Task</h3>
             <form id="taskForm">
-                <input type="text" id="taskTitle" placeholder="Enter task title" required>
-                <textarea id="taskDescription" placeholder="Enter task description (optional)"></textarea>
-                <select id="taskPriority">
-                    <option value="3">⚪ Low Priority</option>
-                    <option value="2" selected>🟡 Medium Priority</option>
+                <div class="form-group">
+                    <label for="taskTitle">Task Title *</label>
+                    <input type="text" id="taskTitle" class="form-control" placeholder="Enter task title" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="taskDescription">Description</label>
+                    <textarea id="taskDescription" class="form-control" placeholder="Enter task description (optional)" rows="2"></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="taskPriority">Priority</label>
+                        <select id="taskPriority" class="form-control">
+                            <option value="3" selected>⚪ Low Priority</option>
+                    <option value="2">🟡 Medium Priority</option>
                     <option value="1">🔴 High Priority</option>
-                </select>
-                <button type="submit">Add Task</button>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="taskDeadline">Deadline (Optional)</label>
+                        <input type="datetime-local" id="taskDeadline" class="form-control">
+                    </div>
+
+                    <div class="form-group align-end">
+                        <button type="submit" class="btn">Add Task</button>
+                    </div>
+                </div>
             </form>
         </div>
-        
+
         <!-- Список задач -->
         <div id="tasksSection">
             <h3>Your Tasks</h3>
             <div id="tasksContainer">
-                <p>No tasks yet. Create your first task above!</p>
+                <p class="text-center">No tasks yet. Create your first task above!</p>
             </div>
         </div>
     </div>
-    
+
     <script>
         // Функция для выхода из системы
         document.getElementById('logoutBtn').addEventListener('click', function(e) {
             e.preventDefault();
-            
+
             // Отправляем POST запрос на endpoint logout
             fetch('/api/auth/logout', {
                 method: 'POST',
@@ -75,19 +96,78 @@
                 alert('Network error occurred during logout');
             });
         });
-        
-        // Базовый JavaScript для работы с формой задач
+
+        // Функция для создания задачи
         document.getElementById('taskForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            // Пока просто показываем alert с данными формы
-            const title = document.getElementById('taskTitle').value;
-            const description = document.getElementById('taskDescription').value;
-            const priority = document.getElementById('taskPriority').value;
             
-            alert(`Task would be created:\nTitle: ${title}\nDescription: ${description}\nPriority: ${priority}`);
+            // Собираем данные из формы
+            const title = document.getElementById('taskTitle').value.trim();
+            const description = document.getElementById('taskDescription').value.trim();
+            const priority = parseInt(document.getElementById('taskPriority').value);
+            const deadline = document.getElementById('taskDeadline').value; // Может быть пустым
             
-            // Очищаем форму после "создания"
-            document.getElementById('taskForm').reset();
+            // Валидация
+            if (!title) {
+                alert('Please enter a task title');
+                return;
+            }
+            
+            // Подготавливаем данные для отправки
+            const taskData = {
+                title: title,
+                description: description,
+                priority: priority,
+                status: 0  // ACTIVE по умолчанию
+            };
+            
+            // Добавляем deadline если он указан
+            if (deadline) {
+                taskData.deadline = deadline;
+            }
+            
+            // Отправляем данные на сервер
+            fetch('/api/tasks', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(taskData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => Promise.reject(err));
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Показываем сообщение об успехе
+                    alert('Task created successfully!');
+                    
+                    // Очищаем форму (оставляем приоритет по умолчанию)
+                    document.getElementById('taskTitle').value = '';
+                    document.getElementById('taskDescription').value = '';
+                    document.getElementById('taskDeadline').value = '';
+                    // Приоритет остается как есть (Low по умолчанию)
+                    
+                    // Фокус на поле заголовка для следующей задачи
+                    document.getElementById('taskTitle').focus();
+                    
+                    // Здесь можно добавить обновление списка задач
+                    // loadTasks(); // Если реализуем функцию загрузки задач
+                } else {
+                    alert('Error creating task: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                if (error.error) {
+                    alert('Error creating task: ' + error.error);
+                } else {
+                    alert('Network error occurred. Please try again.');
+                }
+            });
         });
     </script>
 </body>
