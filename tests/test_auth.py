@@ -1,18 +1,7 @@
 # tests/test_auth.py
 import pytest
-from app.app import create_app
 import app.utils as utils
 
-
-@pytest.fixture
-def client():
-    """Фикстура для создания тестового клиента"""
-    app = create_app()
-    app.config['TESTING'] = True
-    app.config['SECRET_KEY'] = 'test-secret-key-for-testing'
-    
-    with app.test_client() as client:
-        yield client
 
 def test_user_session_authentication(client):
     """Test: application should authenticate user via session"""
@@ -70,7 +59,6 @@ def test_unauthenticated_user_redirected_to_login(client):
     assert 'Location' in response.headers
     assert '/login' in response.headers['Location']
 
-# tests/test_auth.py (добавить)
 def test_challenge_generation_endpoint(client):
     """Test: POST /api/auth/challenge should generate challenge message"""
     response = client.post('/api/auth/challenge', 
