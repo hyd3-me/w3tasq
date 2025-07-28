@@ -4,10 +4,7 @@ Test suite for database models.
 Following TDD methodology - tests first, then implementation.
 """
 
-import pytest
 from datetime import datetime
-# Import fixture from existing test file
-from tests.test_database import db_app
 # Import User model inside test to avoid circular imports
 from app import db_utils
 
@@ -15,9 +12,8 @@ from app import db_utils
 class TestUserModel:
     """Test cases for User model."""
 
-    def test_user_creation(self, db_app):
+    def test_user_creation(self, app, _db):
         """Test basic user creation with required fields."""
-        app, db = db_app
         
         with app.app_context():
             wallet_address="0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6"
@@ -25,8 +21,8 @@ class TestUserModel:
             user, was_created = db_utils.get_or_create_user(wallet_address)
             
             # Add to database
-            db.session.add(user)
-            db.session.commit()
+            _db.session.add(user)
+            _db.session.commit()
             
             # Verify user was saved
             assert user.id is not None
@@ -34,9 +30,8 @@ class TestUserModel:
             assert isinstance(user.created_at, datetime)
             assert user.is_active is True
     
-    def test_user_indb(self, db_app):
+    def test_user_indb(self, app):
         """Test basic user creation with required fields."""
-        app, db = db_app
         
         with app.app_context():
             wallet_address="0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6"
@@ -54,9 +49,8 @@ class TestUserModel:
 class TestTaskModel:
     """Test cases for Task model."""
 
-    def test_task_creation(self, db_app):
+    def test_task_creation(self, app):
         """Test basic task creation with required fields."""
-        app, db = db_app
         
         with app.app_context():
             # First create a user (tasks belong to users)
