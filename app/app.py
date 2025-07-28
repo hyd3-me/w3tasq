@@ -104,6 +104,38 @@ def create_app(config_name='default'):
         except Exception as e:
             return jsonify({'error': 'Internal server error'}), 500
     
+    @app.route('/api/tasks', methods=['POST'])
+    def create_task():
+        """Create a new task for authenticated user"""
+        try:
+            # Проверяем аутентификацию
+            if not session.get('authenticated') or not session.get('user_id'):
+                return jsonify({'error': 'Authentication required'}), 401
+            
+            user_id = session['user_id']
+            data = request.get_json()
+            
+            # Валидация обязательных полей
+            if not data or not data.get('title'):
+                return jsonify({'error': 'Title is required'}), 400
+            
+            # Создаем задачу
+            task = db_utils.create_task(
+                user_id=user_id,
+                title=data['title'],
+                description=data.get('description', ''),
+                priority=data.get('priority', 3),  # По умолчанию LOW
+                status=data.get('status', 0)       # По умолчанию ACTIVE
+            )
+            return jsonify({
+                'success': True,
+                'task': task.to_dict()
+            }), 201
+
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'error': 'Internal server error'}), 500
+    
     return app
 
 # Для запуска в production
