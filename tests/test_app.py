@@ -42,3 +42,33 @@ def test_private_data_contains_secret_key():
         pytest.fail("private_data.py file not found or not accessible")
     except AttributeError:
         pytest.fail("SECRET_KEY variable not found in private_data.py")
+
+def test_create_task_api_endpoint(client):
+    """Test: authenticated user can create task via API endpoint"""
+    # Сначала аутентифицируем пользователя
+    with client.session_transaction() as session:
+        session['user_address'] = '0x742d35Cc6634C0532925a3b8D4C7d26990d0f7f6'
+        session['user_id'] = 1  # Предположим, что у нас есть пользователь с ID=1
+        session['authenticated'] = True
+    
+    # Отправляем POST запрос на создание задачи
+    task_data = {
+        'title': 'Test task from browser',
+        'description': 'This task was created through browser API',
+        'priority': 2,
+        'status': 0
+    }
+    
+    response = client.post('/api/tasks', 
+                          json=task_data,
+                          content_type='application/json')
+    
+    # Проверяем успешный ответ
+    assert response.status_code == 201  # Created
+    assert 'application/json' in response.content_type
+    
+    # Проверяем содержимое ответа
+    data = response.get_json()
+    assert data['success'] is True
+    assert data['task']['title'] == 'Test task from browser'
+    assert data['task']['user_id'] == 1
