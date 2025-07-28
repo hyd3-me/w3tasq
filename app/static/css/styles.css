@@ -1,0 +1,142 @@
+/* app/static/css/styles.css */
+/* Общие стили для всего приложения */
+
+/* Основные переменные */
+:root {
+    --primary-color: #007cba;
+    --primary-hover: #005a87;
+    --background-color: #f5f5f5;
+    --container-bg: white;
+    --border-color: #ddd;
+    --text-color: #333;
+    --text-light: #666;
+    --success-color: #4CAF50;
+    --warning-color: #ff9800;
+    --error-color: #f44336;
+    --logout-bg: #dc3545;
+    --logout-hover: #c82333;
+}
+
+/* Основные стили */
+body { 
+    font-family: Arial, sans-serif; 
+    margin: 0;
+    padding: 0;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: var(--container-bg);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.header {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.user-info {
+    font-size: 14px;
+    color: var(--text-light);
+    text-align: right;
+}
+
+.welcome-text {
+    font-size: 18px;
+    color: var(--text-color);
+    margin: 10px 0;
+}
+
+.task-form {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 5px;
+    margin-bottom: 30px;
+    border: 1px solid #e9ecef;
+}
+
+.task-form h3 {
+    margin-top: 0;
+    color: var(--text-color);
+}
+
+.task-form input, 
+.task-form textarea, 
+.task-form select {
+    width: 100%;
+    margin: 8px 0;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.task-form button {
+    background: var(--primary-color);
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.task-form button:hover {
+    background: var(--primary-hover);
+}
+
+.logout-btn {
+    background: var(--logout-bg);
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+}
+
+.logout-btn:hover {
+    background: var(--logout-hover);
+}
+
+#tasksSection {
+    margin-top: 30px;
+}
+
+#tasksSection h3 {
+    color: var(--text-color);
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .container {
+        margin: 10px;
+        padding: 15px;
+    }
+    
+    .header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .user-info {
+        text-align: center;
+        margin-top: 10px;
+    }
+}
