@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Подключаем CSS файл -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
     <div class="container">
@@ -44,8 +45,8 @@
                         <label for="taskPriority">Priority</label>
                         <select id="taskPriority" class="form-control">
                             <option value="3" selected>⚪ Low Priority</option>
-                    <option value="2">🟡 Medium Priority</option>
-                    <option value="1">🔴 High Priority</option>
+                            <option value="2">🟡 Medium Priority</option>
+                            <option value="1">🔴 High Priority</option>
                         </select>
                     </div>
 
@@ -70,105 +71,7 @@
         </div>
     </div>
 
-    <script>
-        // Функция для выхода из системы
-        document.getElementById('logoutBtn').addEventListener('click', function(e) {
-            e.preventDefault();
-
-            // Отправляем POST запрос на endpoint logout
-            fetch('/api/auth/logout', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Перенаправляем на страницу логина
-                    window.location.href = '/login';
-                } else {
-                    alert('Logout failed: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Network error occurred during logout');
-            });
-        });
-
-        // Функция для создания задачи
-        document.getElementById('taskForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Собираем данные из формы
-            const title = document.getElementById('taskTitle').value.trim();
-            const description = document.getElementById('taskDescription').value.trim();
-            const priority = parseInt(document.getElementById('taskPriority').value);
-            const deadline = document.getElementById('taskDeadline').value; // Может быть пустым
-            
-            // Валидация
-            if (!title) {
-                alert('Please enter a task title');
-                return;
-            }
-            
-            // Подготавливаем данные для отправки
-            const taskData = {
-                title: title,
-                description: description,
-                priority: priority,
-                status: 0  // ACTIVE по умолчанию
-            };
-            
-            // Добавляем deadline если он указан
-            if (deadline) {
-                taskData.deadline = deadline;
-            }
-            
-            // Отправляем данные на сервер
-            fetch('/api/tasks', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(taskData)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(err => Promise.reject(err));
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    // Показываем сообщение об успехе
-                    alert('Task created successfully!');
-                    
-                    // Очищаем форму (оставляем приоритет по умолчанию)
-                    document.getElementById('taskTitle').value = '';
-                    document.getElementById('taskDescription').value = '';
-                    document.getElementById('taskDeadline').value = '';
-                    // Приоритет остается как есть (Low по умолчанию)
-                    
-                    // Фокус на поле заголовка для следующей задачи
-                    document.getElementById('taskTitle').focus();
-                    
-                    // Здесь можно добавить обновление списка задач
-                    // loadTasks(); // Если реализуем функцию загрузки задач
-                } else {
-                    alert('Error creating task: ' + (data.error || 'Unknown error'));
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                if (error.error) {
-                    alert('Error creating task: ' + error.error);
-                } else {
-                    alert('Network error occurred. Please try again.');
-                }
-            });
-        });
-    </script>
+    <!-- Подключаем JavaScript файл -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
