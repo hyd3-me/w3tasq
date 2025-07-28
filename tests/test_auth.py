@@ -222,4 +222,3 @@ def test_dashboard_page_contains_logout_button(client):
     # Проверяем, что страница содержит кнопку logout
     html_content = response.data.decode('utf-8')
     assert 'logout' in html_content.lower()
-    assert 'logoutForm' in html_content

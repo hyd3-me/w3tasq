@@ -72,3 +72,24 @@ def test_create_task_api_endpoint(client):
     assert data['success'] is True
     assert data['task']['title'] == 'Test task from browser'
     assert data['task']['user_id'] == 1
+
+def test_index_page_contains_task_form(client):
+    """Test: authenticated user sees task creation form on index page"""
+    # Authenticate user by adding to session
+    with client.session_transaction() as session:
+        session['user_address'] = '0x742d35Cc6634C0532925a3b8D4C7d26990d0f7f6'
+        session['authenticated'] = True
+
+    # Request home page
+    response = client.get('/')
+    
+    # Should show dashboard (200 OK)
+    assert response.status_code == 200
+    # Should return HTML
+    assert 'text/html' in response.content_type
+    
+    # Проверяем, что страница содержит форму для создания задачи
+    html_content = response.get_data(as_text=True)
+    
+    # Проверяем наличие ключевых элементов формы
+    assert 'Create New Task' in html_content
