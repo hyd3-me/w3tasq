@@ -5,26 +5,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}w3tasq - Web3 Task & Note Tracker{% endblock %}</title>
-    <!-- Подключаем общий CSS -->
+    <!-- Link to the main CSS file -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <!-- Блок для дополнительных стилей, специфичных для страницы -->
+    <!-- Block for page-specific additional styles -->
     {% block extra_styles %}{% endblock %}
 </head>
 <body>
     <div class="container">
-        <!-- Блок для основного содержимого страницы -->
+        <!-- Block for the main page content -->
         {% block content %}{% endblock %}
     </div>
-    <footer style="text-align: center; margin-top: 20px; padding: 10px; border-top: 1px solid #ccc;">
-        <div style="margin-top: 10px;">
-            <button id="themeToggle" class="btn" style="padding: 5px 10px; font-size: 12px;">🌓 Toggle Theme</button><p>&copy; w3tasq. All rights reserved.</p>
+    
+    <!-- Footer with theme toggle button -->
+    <!-- Using structure and styles from CSS, removing inline styles -->
+    <footer>
+        <div>
+            <!-- Theme toggle button in the footer -->
+            <button id="themeToggle" class="btn">🌓 Toggle Theme</button>
+        </div>
+        <div>
+            <p>&copy; w3tasq. All rights reserved.</p>
         </div>
     </footer>
 
-    <!-- Подключаем общий JavaScript -->
+    <!-- Link to the main JavaScript file -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    <!-- Блок для дополнительных скриптов, специфичных для страницы -->
+    <!-- Block for page-specific additional scripts -->
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>

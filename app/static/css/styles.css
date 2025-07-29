@@ -1,115 +1,114 @@
 /* app/static/css/styles.css */
-/* Общие стили для всего приложения с поддержкой темной темы */
+/* General styles for the application with dark theme support */
 
-/* ========== СВЕТЛАЯ ТЕМА (по умолчанию) - Обновленная "теплая" версия ========== */
+/* ========== LIGHT THEME (default) - Updated "warm" version ========== */
 :root {
-    /* --- Фоны --- */
-    /* Вместо резкого белого (#ffffff) и серого (#f5f5f5), 
-       используем мягкие, слегка теплые оттенки */
-    --bg-color: #f8f9fa;           /* Очень светло-серый, почти белый, но мягче */
-    --container-bg: #ffffff;       /* Чистый белый для контейнеров */
-    --card-bg: #f1f3f5;            /* Легко-серый для карточек/форм */
-    --input-bg: #ffffff;           /* Белый для полей ввода */
-    --priority-1-bg: #ffe3e3;      /* Светло-красный */
-    --priority-2-bg: #fff3bf;      /* Светло-желтый */
-    --priority-3-bg: #e7f5ff;      /* Светло-голубой/серый */
+  /* --- Backgrounds --- */
+  /* Instead of harsh white (#ffffff) and gray (#f5f5f5),
+     use soft, slightly warm shades */
+  --bg-color: #f8f9fa;           /* Very light gray, almost white, but softer */
+  --container-bg: #ffffff;       /* Pure white for containers */
+  --card-bg: #f1f3f5;            /* Light gray for cards/forms */
+  --input-bg: #ffffff;           /* White for input fields */
+  --priority-1-bg: #ffe3e3;      /* Light red */
+  --priority-2-bg: #fff3bf;      /* Light yellow */
+  --priority-3-bg: #e7f5ff;      /* Light blue/gray */
 
-    /* --- Цвета текста --- */
-    /* Вместо резкого черного, используем темно-серый */
-    --text-color: #212529;         /* Темно-серый (ближе к черному, но мягче) */
-    --text-light: #495057;         /* Средне-темно-серый для второстепенного текста */
-    --text-inverted: #ffffff;      /* По-прежнему белый для текста на кнопках */
+  /* --- Text Colors --- */
+  /* Instead of harsh black, use dark gray */
+  --text-color: #212529;         /* Dark gray (closer to black, but softer) */
+  --text-light: #495057;         /* Medium-dark gray for secondary text */
+  --text-inverted: #ffffff;      /* Still white for text on buttons */
 
-    /* --- Границы --- */
-    /* Более мягкие, нейтральные серые */
-    --border-color: #dee2e6;       /* Светло-серый */
-    --border-card: #ced4da;        /* Средне-светло-серый */
+  /* --- Borders --- */
+  /* Softer, neutral grays */
+  --border-color: #dee2e6;       /* Light gray */
+  --border-card: #ced4da;        /* Medium-light gray */
 
-    /* --- Основные цвета (акценты) - немного приглушены для гармонии --- */
-    --primary-color: #3b82f6;      /* Приглушенный синий (вместо #007cba) */
-    --primary-hover: #2563eb;      /* Темнее при наведении */
-    --secondary-color: #6c757d;    /* Серый (остается как есть) */
-    --success-color: #10b981;      /* Приглушенный зеленый (вместо #28a745) */
-    --warning-color: #f59e0b;      /* Приглушенный оранжевый (вместо #ffc107) */
-    --danger-color: #ef4444;       /* Приглушенный красный (вместо #dc3545) */
-    --info-color: #0ea5e9;         /* Приглушенный голубой (вместо #17a2b8) */
+  /* --- Primary Colors (accents) - slightly desaturated for harmony --- */
+  --primary-color: #3b82f6;      /* Desaturated blue (instead of #007cba) */
+  --primary-hover: #2563eb;      /* Darker on hover */
+  --secondary-color: #6c757d;    /* Gray (remains as is) */
+  --success-color: #10b981;      /* Desaturated green (instead of #28a745) */
+  --warning-color: #f59e0b;      /* Desaturated orange (instead of #ffc107) */
+  --danger-color: #ef4444;       /* Desaturated red (instead of #dc3545) */
+  --info-color: #0ea5e9;         /* Desaturated blue (instead of #17a2b8) */
 
-    /* --- Цвета кнопок --- */
-    --btn-primary-bg: var(--primary-color);
-    --btn-primary-hover: var(--primary-hover);
-    --btn-primary-text: var(--text-inverted);
-    --btn-danger-bg: var(--danger-color);
-    --btn-danger-hover: #dc2626; /* Темнее */
-    --btn-danger-text: var(--text-inverted);
-    --btn-secondary-bg: var(--secondary-color);
-    --btn-secondary-hover: #5a6268; /* Темнее */
-    --btn-secondary-text: var(--text-inverted);
+  /* --- Button Colors --- */
+  --btn-primary-bg: var(--primary-color);
+  --btn-primary-hover: var(--primary-hover);
+  --btn-primary-text: var(--text-inverted);
+  --btn-danger-bg: var(--danger-color);
+  --btn-danger-hover: #dc2626; /* Darker */
+  --btn-danger-text: var(--text-inverted);
+  --btn-secondary-bg: var(--secondary-color);
+  --btn-secondary-hover: #5a6268; /* Darker */
+  --btn-secondary-text: var(--text-inverted);
 
-    /* --- Границы приоритетов (более насыщенные для контраста на светлом) --- */
-    --priority-1-border: #ef4444; /* Красный */
-    --priority-2-border: #f59e0b; /* Желтый/Оранжевый */
-    --priority-3-border: #3b82f6; /* Синий */
+  /* --- Priority Borders (more saturated for contrast on light) --- */
+  --priority-1-border: #ef4444; /* Red */
+  --priority-2-border: #f59e0b; /* Yellow/Orange */
+  --priority-3-border: #3b82f6; /* Blue */
 
-    /* --- Другие --- */
-    --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); /* Очень легкая тень */
-    --border-radius: 5px;
-    --transition-speed: 0.3s;
+  /* --- Other --- */
+  --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); /* Very light shadow */
+  --border-radius: 5px;
+  --transition-speed: 0.3s;
 }
 
-/* ========== ТЕМНАЯ ТЕМА ========== */
+/* ========== DARK THEME ========== */
 .dark-theme {
-    /* --- Фоны --- */
-    --bg-color: #121212;        /* Очень темный фон */
-    --container-bg: #1e1e1e;    /* Фон контейнеров */
-    --card-bg: #2d2d2d;         /* Фон карточек/форм */
-    --input-bg: #2d2d2d;        /* Фон полей ввода */
-    --priority-1-bg: #2c0000;   /* Очень темный красный */
-    --priority-2-bg: #332200;   /* Очень темный желтый */
-    --priority-3-bg: #1e1e1e;   /* Как основной фон контейнера */
+  /* --- Backgrounds --- */
+  --bg-color: #121212;        /* Very dark background */
+  --container-bg: #1e1e1e;    /* Background for containers */
+  --card-bg: #2d2d2d;         /* Background for cards/forms */
+  --input-bg: #2d2d2d;        /* Background for input fields */
+  --priority-1-bg: #2c0000;   /* Very dark red */
+  --priority-2-bg: #332200;   /* Very dark yellow */
+  --priority-3-bg: #1e1e1e;   /* Same as main container background */
 
-    /* --- Цвета текста --- */
-    --text-color: #e0e0e0;      /* Светло-серый текст */
-    --text-light: #b0b0b0;      /* Более светлый серый для второстепенного текста */
-    --text-inverted: #000000;   /* Черный текст на цветных кнопках */
+  /* --- Text Colors --- */
+  --text-color: #e0e0e0;      /* Light gray text */
+  --text-light: #b0b0b0;      /* Lighter gray for secondary text */
+  --text-inverted: #000000;   /* Black text on colored buttons */
 
-    /* --- Границы --- */
-    --border-color: #333333;
-    --border-card: #444444;
+  /* --- Borders --- */
+  --border-color: #333333;
+  --border-card: #444444;
 
-    /* --- Основные цвета (теплые/насыщенные для контраста на темном) --- */
-    --primary-color: #bb86fc;       /* Фиолетовый (Material Dark) */
-    --primary-hover: #d0bcff;
-    --secondary-color: #9e9e9e;     /* Светло-серый */
-    --success-color: #4caf50;       /* Зеленый */
-    --warning-color: #ff9800;       /* Оранжевый */
-    --danger-color: #cf6679;        /* Розово-красный (Material Dark Error) */
-    --info-color: #03dac6;          /* Бирюзовый */
+  /* --- Primary Colors (warm/saturated for contrast on dark) --- */
+  --primary-color: #bb86fc;       /* Purple (Material Dark) */
+  --primary-hover: #d0bcff;
+  --secondary-color: #9e9e9e;     /* Light gray */
+  --success-color: #4caf50;       /* Green */
+  --warning-color: #ff9800;       /* Orange */
+  --danger-color: #cf6679;        /* Pinkish-red (Material Dark Error) */
+  --info-color: #03dac6;          /* Teal */
 
-    /* --- Цвета кнопок --- */
-    --btn-primary-bg: var(--primary-color);
-    --btn-primary-hover: var(--primary-hover);
-    --btn-primary-text: var(--text-inverted);
-    --btn-danger-bg: var(--danger-color);
-    --btn-danger-hover: #ff7997; /* Светлее оттенок */
-    --btn-danger-text: var(--text-inverted);
-    --btn-secondary-bg: var(--secondary-color);
-    --btn-secondary-hover: #bdbdbd; /* Светлее оттенок */
-    --btn-secondary-text: var(--text-inverted);
+  /* --- Button Colors --- */
+  --btn-primary-bg: var(--primary-color);
+  --btn-primary-hover: var(--primary-hover);
+  --btn-primary-text: var(--text-inverted);
+  --btn-danger-bg: var(--danger-color);
+  --btn-danger-hover: #ff7997; /* Lighter shade */
+  --btn-danger-text: var(--text-inverted);
+  --btn-secondary-bg: var(--secondary-color);
+  --btn-secondary-hover: #bdbdbd; /* Lighter shade */
+  --btn-secondary-text: var(--text-inverted);
 
-    /* --- Границы приоритетов --- */
-    --priority-1-border: #ff5252; /* Красный */
-    --priority-2-border: #ffd740; /* Желтый */
-    --priority-3-border: #9e9e9e; /* Серый */
+  /* --- Priority Borders --- */
+  --priority-1-border: #ff5252; /* Red */
+  --priority-2-border: #ffd740; /* Yellow */
+  --priority-3-border: #9e9e9e; /* Gray */
 
-    /* --- Другие --- */
-    --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); /* Более заметная тень на темном */
-    /* border-radius и transition-speed остаются такими же */
+  /* --- Other --- */
+  --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); /* More noticeable shadow on dark */
+  /* border-radius and transition-speed remain the same */
 }
 
+/* ========== BASE STYLES ========== */
 
-/* ========== БАЗОВЫЕ СТИЛИ ========== */
-
-/* Применение переходов ко всему, что меняет цвет */
+/* Apply transitions to everything that changes color */
 body,
 .container,
 .form-control,
@@ -123,434 +122,386 @@ footer {
                 box-shadow var(--transition-speed);
 }
 
-/* Основной фон и текст */
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: var(--bg-color);
-    color: var(--text-color);
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-color);
+  color: var(--text-color);
 }
 
-/* Основной контейнер страницы */
+/* Main page container */
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    background: var(--container-bg);
-    padding: 20px;
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-    margin-top: 20px;
-    margin-bottom: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: var(--container-bg);
+  padding: 20px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
-/* ========== ЗАГОЛОВКИ И НАВИГАЦИЯ ========== */
+/* ========== HEADERS AND NAVIGATION ========== */
 
-/* Заголовок и навигация в шапке */
+/* Header and navigation in the header */
 .header {
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 20px;
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
-/* Информация о пользователе */
+/* User information */
 .user-info {
-    font-size: 14px;
-    color: var(--text-light);
-    text-align: right;
+  font-size: 14px;
+  color: var(--text-light);
+  text-align: right;
 }
 
-/* Приветственный текст */
+/* Welcome text */
 .welcome-text {
-    font-size: 18px;
-    color: var(--text-color);
-    margin: 10px 0;
+  font-size: 18px;
+  color: var(--text-color);
+  margin: 10px 0;
 }
 
-/* ========== ФОРМЫ ========== */
+/* ========== FORMS ========== */
 
-/* Общий стиль для форм */
-/* ========== Обновленные стили для формы создания задачи (для обеих тем) ========== */
+/* General style for forms */
 .task-form {
-    background-color: var(--card-bg); /* Используем переменную темы */
-    padding: 20px;
-    border-radius: var(--border-radius);
-    margin-bottom: 30px;
-    border: 1px solid var(--border-card); /* Используем переменную темы */
+  background-color: var(--card-bg);
+  padding: 20px;
+  border-radius: var(--border-radius);
+  margin-bottom: 30px;
+  border: 1px solid var(--border-card);
 }
 
 .task-form h3 {
-    color: var(--text-color); /* Используем переменную темы */
-    margin-top: 0;
-    margin-bottom: 20px; /* Увеличенный отступ */
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--border-color); /* Используем переменную темы */
+  color: var(--text-color);
+  margin-top: 0;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
 }
 
+/* Form field groups */
 .form-group {
-    margin-bottom: 20px; /* Увеличенный отступ между группами */
+  margin-bottom: 20px;
 }
 
 .form-group label {
-    display: block;
-    margin-bottom: 6px;
-    font-weight: 500;
-    color: var(--text-color); /* Используем переменную темы */
-    /* Для светлой темы цвет будет из :root, для темной - из .dark-theme */
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: var(--text-color);
 }
 
+/* Input fields, text areas, selects */
 .form-control {
-    width: 100%;
-    padding: 12px; /* Увеличенный padding */
-    border: 1px solid var(--border-color); /* Используем переменную темы */
-    border-radius: 4px; /* Скругление углов */
-    box-sizing: border-box;
-    font-size: 16px;
-    background-color: var(--input-bg); /* Используем переменную темы */
-    color: var(--text-color); /* Используем переменную темы */
-    transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 16px;
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
 }
 
+/* Style for focus on input field */
 .form-control:focus {
-    outline: none;
-    /* Основной цвет фокуса определяется в :root */
-    border-color: var(--primary-color);
-    /* Тень фокуса определяется отдельно для темной темы */
-    box-shadow: 0 0 0 2px rgba(0, 124, 186, 0.2);
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(0, 124, 186, 0.2);
 }
-
-/* Стили для строки с полями приоритета, дедлайна и кнопки */
-.form-row {
-    display: flex;
-    gap: 15px; /* Увеличенный отступ */
-    margin-bottom: 10px;
-    align-items: end;
-}
-
-.form-row .form-group {
-    flex: 1;
-    margin-bottom: 0; /* Убираем нижний margin у групп внутри строки */
-}
-
-.form-row .align-end {
-    align-self: flex-end;
-    flex: 0 0 auto; /* Кнопка не растягивается */
-}
-
-/* Стили для кнопки "Add Task" в форме */
-.task-form .btn {
-    width: 100%;
-    padding: 14px;
-    font-size: 16px;
-    font-weight: 500;
-    margin-top: 5px;
-}
-
-/* Стили для селекта приоритета */
-#taskPriority {
-    background-color: var(--input-bg); /* Используем переменную темы */
-    color: var(--text-color); /* Используем переменную темы */
-    /* Примечание: кастомная стрелочка из темной темы может не работать в светлой,
-       так как цвет стрелочки был подогнан под темный фон.
-       Можно оставить стандартную стрелочку браузера для светлой темы
-       или адаптировать SVG. Пока оставим как есть. */
-    appearance: none; /* Убираем стандартный стиль браузера для единообразия */
-    padding-right: 30px; /* Место для стрелочки, если добавим */
-}
-
-/* Стили для datetime-local */
-#taskDeadline {
-    background-color: var(--input-bg);
-    color: var(--text-color);
-}
-#taskDeadline::-webkit-calendar-picker-indicator {
-    /* Иконка календаря в светлой теме обычно хорошо видна, фильтр не нужен */
-    cursor: pointer;
-}
-/* Обновленный стиль фокуса для темной темы */
+/* For dark theme, slightly change the focus shadow color */
 .dark-theme .form-control:focus {
-    /* Переопределяем цвет границы и тени для темной темы */
-    border-color: #bb86fc; /* Фиолетовая граница */
-    box-shadow: 0 0 0 3px rgba(187, 134, 252, 0.2); /* Внутренняя тень */
+  box-shadow: 0 0 0 3px rgba(187, 134, 252, 0.2);
 }
 
-/* ========== КНОПКИ ========== */
+/* ========== BUTTONS ========== */
 
-/* Общий стиль кнопок */
+/* General button style */
 .btn {
-    display: inline-block;
-    padding: 12px 24px;
-    /* background-color: var(--primary-color); */
-    /* color: white; */
-    border: none;
-    border-radius: var(--border-radius);
-    cursor: pointer;
-    font-size: 16px;
-    text-decoration: none;
-    text-align: center;
-    transition: background-color var(--transition-speed);
+  display: inline-block;
+  padding: 12px 24px;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 16px;
+  text-decoration: none;
+  text-align: center;
+  transition: background-color var(--transition-speed);
 }
 
-/* Основная кнопка (например, Add Task) */
+/* Primary button (e.g., Add Task) */
 .btn {
-    background-color: var(--btn-primary-bg);
-    color: var(--btn-primary-text);
+  background-color: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
 }
 .btn:hover {
-    background-color: var(--btn-primary-hover);
+  background-color: var(--btn-primary-hover);
 }
 
-/* Кнопка "Опасности" (Logout) */
-.logout-btn {
-    background-color: var(--btn-danger-bg);
-    color: var(--btn-danger-text);
+/* Danger button (Logout) */
+a.logout-btn, /* Specific style for logout link */
+.btn.logout-btn {
+  background-color: var(--btn-danger-bg);
+  color: var(--btn-danger-text);
+  /* Ensure link-specific styles are overridden */
+  display: inline-block;
+  padding: 12px 24px;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 16px;
+  text-decoration: none;
+  text-align: center;
+  transition: background-color var(--transition-speed);
 }
-.logout-btn:hover {
-    background-color: var(--btn-danger-hover);
+a.logout-btn:hover,
+.btn.logout-btn:hover {
+  background-color: var(--btn-danger-hover);
 }
 
-/* Кнопка на всю ширину */
+/* Full-width button */
 .btn-block {
-    display: block;
-    width: 100%;
+  display: block;
+  width: 100%;
 }
 
-/* ========== НАВИГАЦИЯ МЕЖДУ СЕКЦИЯМИ ========== */
+/* ========== SECTION NAVIGATION ========== */
 
-/* Навигационное меню */
+/* Navigation menu */
 .section-nav {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid var(--border-color);
+  display: flex;
+  gap: 15px; /* Increased spacing */
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--border-color);
 }
 
-/* Кнопки навигации */
+/* Navigation buttons */
 .nav-btn {
-    background-color: var(--card-bg); /* Цвет фона как у карточек */
-    color: var(--text-color);
-    border: 1px solid var(--border-color);
-    padding: 10px 20px;
-    border-radius: var(--border-radius);
-    cursor: pointer;
-    font-size: 16px;
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  padding: 10px 20px;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 16px;
 }
 
 .nav-btn:hover {
-    background-color: var(--border-color); /* При наведении чуть темнее */
+  background-color: var(--border-color);
 }
 
 .nav-btn.active {
-    background-color: var(--primary-color);
-    color: var(--btn-primary-text); /* Белый текст на активной кнопке */
-    border-color: var(--primary-color);
+  background-color: var(--primary-color);
+  color: var(--btn-primary-text);
+  border-color: var(--primary-color);
 }
 
-/* ========== СЕКЦИИ ========== */
+/* ========== SECTIONS ========== */
 
-/* Общий стиль для секций */
+/* General style for sections */
 .section {
-    display: none;
+  display: none;
 }
 
 .section.active {
-    display: block;
-    animation: fadeIn 0.3s ease-in-out;
+  display: block;
+  animation: fadeIn 0.3s ease-in-out;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* ========== ЗАДАЧИ ========== */
+/* ========== TASKS ========== */
 
-/* Контейнер для списка задач с прокруткой */
+/* Container for the task list with scrolling */
 #tasksContainer {
-    max-height: 600px;
-    overflow-y: auto;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    padding: 10px;
-    background-color: var(--card-bg);
+  max-height: 600px;
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 10px;
+  background-color: var(--card-bg);
 }
 
-/* Стиль отдельной задачи */
+/* Style for individual task */
 .task-item {
-    border: 1px solid var(--border-color);
-    padding: 15px;
-    margin: 10px 0;
-    border-radius: var(--border-radius);
-    background: var(--container-bg); /* Фон задачи как у основного контейнера */
+  border: 1px solid var(--border-color);
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: var(--border-radius);
+  background: var(--container-bg);
 }
 
-/* Границы слева по приоритетам */
+/* Left borders by priority */
 .task-item.priority-1 {
-    border-left: 4px solid var(--priority-1-border);
-    background-color: var(--priority-1-bg);
+  border-left: 4px solid var(--priority-1-border);
+  background-color: var(--priority-1-bg);
 }
 .task-item.priority-2 {
-    border-left: 4px solid var(--priority-2-border);
-    background-color: var(--priority-2-bg);
+  border-left: 4px solid var(--priority-2-border);
+  background-color: var(--priority-2-bg);
 }
 .task-item.priority-3 {
-    border-left: 4px solid var(--priority-3-border);
-    background-color: var(--priority-3-bg);
+  border-left: 4px solid var(--priority-3-border);
+  background-color: var(--priority-3-bg);
 }
 
-/* Заголовки и текст внутри задач */
+/* Headers and text inside tasks */
 .task-item h4 {
-    color: var(--text-color);
-    margin-top: 0;
+  color: var(--text-color);
+  margin-top: 0;
 }
 .task-item p {
-    color: var(--text-color);
-    margin: 10px 0;
+  color: var(--text-color);
+  margin: 10px 0;
 }
 
-/* ========== СТРАНИЦА ЛОГИНА ========== */
+/* Row with priority, deadline and button fields */
+.form-row {
+  display: flex;
+  gap: 15px; /* Increased spacing */
+  margin-bottom: 10px;
+  align-items: end;
+}
 
+.form-row .form-group {
+  flex: 1;
+  margin-bottom: 0; /* Remove bottom margin for groups inside the row */
+}
+
+.form-row .align-end {
+  align-self: flex-end;
+  flex: 0 0 auto; /* Button does not stretch */
+}
+
+/* Styles for the "Add Task" button in the form */
+.task-form .btn {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 500;
+  margin-top: 5px;
+}
+
+/* Styles for the priority select */
+#taskPriority {
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  appearance: none; /* Remove default browser style for consistency */
+  padding-right: 30px; /* Space for arrow if added */
+}
+
+/* Styles for datetime-local */
+#taskDeadline {
+  background-color: var(--input-bg);
+  color: var(--text-color);
+}
+#taskDeadline::-webkit-calendar-picker-indicator {
+  /* Calendar icon is usually visible in light theme, no filter needed */
+  cursor: pointer;
+}
+/* For dark theme, invert the calendar icon */
+.dark-theme #taskDeadline::-webkit-calendar-picker-indicator {
+  filter: invert(1); /* Invert the color of the calendar icon */
+}
+
+/* ========== LOGIN PAGE ========== */
 .login-container {
-    max-width: 400px;
-    margin: 100px auto;
-    text-align: center;
-    background: var(--card-bg);
-    padding: 30px;
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
+  max-width: 400px;
+  margin: 100px auto;
+  text-align: center;
+  background: var(--card-bg);
+  padding: 30px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
 }
 
-/* ========== ФУТЕР ========== */
-
+/* ========== FOOTER ========== */
 footer {
-    text-align: center;
-    margin-top: 20px;
-    padding: 10px;
-    border-top: 1px solid var(--border-color);
-    color: var(--text-light);
+  /* Убираем старые flex-стили для простоты вертикального центрирования */
+  text-align: center; /* Центрируем содержимое внутри footer по умолчанию */
+  margin-top: 20px;
+  padding: 15px 10px; /* Увеличиваем padding сверху/снизу */
+  border-top: 1px solid var(--border-color);
+  color: var(--text-light);
+  /* background-color: var(--container-bg); */ /* Опционально, если нужен фон */
 }
 
-/* ========== УТИЛИТЫ ========== */
-
+/* ========== UTILITIES ========== */
 .text-center {
-    text-align: center;
+  text-align: center;
 }
 
 .loading {
-    text-align: center;
-    padding: 20px;
-    color: var(--text-light);
+  text-align: center;
+  padding: 20px;
+  color: var(--text-light);
 }
 
-/* ========== АДАПТИВНОСТЬ ========== */
-
+/* ========== RESPONSIVENESS ========== */
 @media (max-width: 768px) {
-    .container {
-        margin: 10px;
-        padding: 15px;
-    }
+  .container {
+    margin: 10px;
+    padding: 15px;
+  }
 
-    .header {
-        flex-direction: column;
-        text-align: center;
-    }
+  .header {
+    flex-direction: column;
+    text-align: center;
+  }
 
-    .user-info {
-        text-align: center;
-        margin-top: 10px;
-    }
+  .user-info {
+    text-align: center;
+    margin-top: 10px;
+  }
 
-    .section-nav {
-        flex-direction: column;
-    }
+  .section-nav {
+    flex-direction: column;
+  }
 
-    .nav-btn {
-        width: 100%;
-    }
+  .nav-btn {
+    width: 100%;
+  }
 }
-/* Уточнение стилей формы в темной теме для лучшей читаемости */
+
+/* ========== DARK THEME SPECIFIC ENHANCEMENTS ========== */
+/* Refined styles for the task form in dark theme for better readability */
+
 .dark-theme .task-form {
-    background-color: #252525; /* Слегка темнее, чем общий card-bg */
-    border: 1px solid #3a3a3a; /* Более отчетливая граница */
+  background-color: #252525; /* Slightly darker than general card-bg */
+  border: 1px solid #3a3a3a; /* More distinct border */
 }
 
 .dark-theme .task-form h3 {
-    color: #f0f0f0; /* Более светлый заголовок */
-    border-bottom: 1px solid #3a3a3a;
-}
-
-.dark-theme .form-group {
-    margin-bottom: 20px; /* Увеличиваем отступы между полями */
+  color: #f0f0f0; /* Lighter header */
+  border-bottom: 1px solid #3a3a3a;
 }
 
 .dark-theme .form-group label {
-    color: #d0d0d0; /* Цвет подписи чуть светлее основного текста */
+  color: #d0d0d0; /* Label color slightly lighter than main text */
 }
 
-/* Стили для полей ввода в темной теме с фокусом */
-.dark-theme .form-control {
-    background-color: #2d2d2d; /* Фон поля ввода */
-    border: 1px solid #444444; /* Граница */
-    color: #e0e0e0; /* Цвет текста */
-    padding: 12px; /* Увеличиваем padding для удобства */
-    font-size: 16px; /* Убедимся, что размер шрифта достаточен */
-    border-radius: 4px; /* Немного скругляем углы */
-    transition: border-color 0.2s, box-shadow 0.2s; /* Плавный переход */
-}
-
-.dark-theme .form-control:focus {
-    outline: none;
-    border-color: #bb86fc; /* Фиолетовая граница при фокусе */
-    box-shadow: 0 0 0 3px rgba(187, 134, 252, 0.2); /* Внутренняя тень */
-    /* Убираем предыдущий стиль тени фокуса для темной темы */
-}
-
-/* Стили для селекта приоритета */
+/* Custom arrow for select in dark theme */
 .dark-theme #taskPriority {
-    /* Убедимся, что стрелочка селекта видна */
-    background-color: #2d2d2d;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23e0e0e0'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 16px;
-    appearance: none; /* Убираем стандартный стиль браузера */
+  background-color: #2d2d2d;
+  color: #e0e0e0;
+  /* White arrow suitable for dark background */
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23e0e0e0'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
 }
-
-/* Стили для datetime-local */
-.dark-theme #taskDeadline::-webkit-calendar-picker-indicator {
-    filter: invert(1); /* Инвертируем цвет иконки календаря */
-}
-/* Для Firefox может потребоваться другой подход, но это покроет большинство случаев */
-
-/* Стили для кнопки "Add Task" в форме */
-.dark-theme .task-form .btn {
-    width: 100%; /* Кнопка на всю ширину группы */
-    padding: 14px; /* Увеличиваем размер кнопки */
-    font-size: 17px; /* Увеличиваем размер шрифта */
-    font-weight: 500; /* Делаем текст кнопки жирнее */
-    letter-spacing: 0.5px; /* Немного увеличиваем расстояние между буквами */
-    margin-top: 5px; /* Небольшой отступ сверху */
-}
-
-/* Стили для строки с полями приоритета, дедлайна и кнопки */
-.dark-theme .form-row {
-    display: flex;
-    gap: 15px; /* Увеличиваем расстояние между элементами */
-    margin-bottom: 10px;
-    align-items: end;
-}
-
-.dark-theme .form-row .form-group {
-    flex: 1; /* Поля растягиваются равномерно */
-    margin-bottom: 0; /* Убираем нижний margin у групп внутри строки */
-}
-
-.dark-theme .form-row .align-end {
-    align-self: flex-end;
-    flex: 0 0 auto; /* Кнопка не растягивается */
-}
+/* ========== END OF DARK THEME SPECIFIC ENHANCEMENTS ========== */
