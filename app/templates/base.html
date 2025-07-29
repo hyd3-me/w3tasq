@@ -1,0 +1,28 @@
+<!-- app/templates/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}w3tasq - Web3 Task & Note Tracker{% endblock %}</title>
+    <!-- Подключаем общий CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <!-- Блок для дополнительных стилей, специфичных для страницы -->
+    {% block extra_styles %}{% endblock %}
+</head>
+<body>
+    <div class="container">
+        <!-- Блок для основного содержимого страницы -->
+        {% block content %}{% endblock %}
+    </div>
+    <footer style="text-align: center; margin-top: 20px; padding: 10px; border-top: 1px solid #ccc;">
+        <p>&copy; w3tasq. All rights reserved.</p>
+    </footer>
+
+    <!-- Подключаем общий JavaScript -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <!-- Блок для дополнительных скриптов, специфичных для страницы -->
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
