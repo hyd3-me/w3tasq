@@ -2,25 +2,18 @@
 from flask import Flask, render_template, session, redirect, url_for, request, jsonify
 from app import utils, db_utils
 from app.models import db
+from app.config import config_map
 
 
 def create_app(config_name='default'):
     """Фабричная функция для создания экземпляра приложения"""
     app = Flask(__name__)
     
-    # Configure secret key for sessions using utils
-    app.secret_key = utils.get_secret_key()
-
-    # Configuration
-    if config_name == 'testing':
-        app.config['TESTING'] = True
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
-    else:
-        # Configure database using path from utils
-        db_path = utils.get_database_path()
-        app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
-
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    # Загружаем конфигурацию
+    app.config.from_object(config_map[config_name])
+    
+    # Инициализируем приложение с конфигом (если нужно)
+    #config_map[config_name].init_app(app)
     
     # Initialize extensions
     db.init_app(app)
@@ -135,6 +128,57 @@ def create_app(config_name='default'):
 
         except Exception as e:
             db.session.rollback()
+            return jsonify({'error': 'Internal server error'}), 500
+    
+    @app.route('/api/tasks', methods=['GET'])
+    def get_user_tasks():
+
+        """Get tasks for the authenticated user with cursor-based pagination."""
+        try:
+            # Проверяем аутентификацию
+            if not session.get('authenticated') or not session.get('user_id'):
+                return jsonify({'error': 'Authentication required'}), 401
+            
+            user_id = session['user_id']
+
+            # --- Cursor-based Pagination ---
+            try:
+                # Получаем курсор из URL
+                cursor_str = request.args.get('cursor', None)
+                
+                # Получаем limit из конфига
+                limit = app.config.get('TASKS_PER_PAGE', 12)
+                
+                # Преобразуем cursor в число, если он есть
+                cursor_id = None
+                if cursor_str:
+                    cursor_id = int(cursor_str)
+                    
+            except (ValueError, TypeError):
+                cursor_id = None
+                limit = app.config.get('TASKS_PER_PAGE', 12)
+            
+            # Получаем задачи и информацию для следующего курсора
+            tasks, next_cursor_id, has_more = db_utils.get_user_tasks_cursor(
+                user_id, cursor_id, limit
+            )
+            
+            # Подготавливаем данные для ответа
+            tasks_data = [task.to_dict() for task in tasks]
+            
+            # Формируем упрощенную информацию о пагинации
+            pagination_info = {
+                'has_more': has_more,
+                'next_cursor': next_cursor_id if has_more else None
+            }
+            
+            return jsonify({
+                'tasks': tasks_data,
+                'pagination': pagination_info
+            })
+            
+        except Exception as e:
+            print(f"Error retrieving tasks: {e}") # Для отладки
             return jsonify({'error': 'Internal server error'}), 500
     
     return app

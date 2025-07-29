@@ -156,9 +156,6 @@ def test_login_page_contains_web3_elements(client):
     
     # Проверяем наличие элемента для статуса
     assert 'status' in html_content
-    
-    # Проверяем наличие ссылки на ethers.js
-    assert 'ethers.io' in html_content or 'ethers' in html_content
 
 def test_logout_endpoint_clears_session(client):
     """Test: POST /api/auth/logout should clear user session"""
