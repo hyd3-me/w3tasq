@@ -431,14 +431,15 @@ a.logout-btn:hover,
 
 /* ========== FOOTER ========== */
 footer {
-  /* Убираем старые flex-стили для простоты вертикального центрирования */
-  text-align: center; /* Центрируем содержимое внутри footer по умолчанию */
+  /* Remove old flex styles for simplicity of vertical centering */
+  text-align: center; /* Center content inside footer by default */
   margin-top: 20px;
-  padding: 15px 10px; /* Увеличиваем padding сверху/снизу */
+  padding: 15px 10px; /* Increase top/bottom padding */
   border-top: 1px solid var(--border-color);
   color: var(--text-light);
-  /* background-color: var(--container-bg); */ /* Опционально, если нужен фон */
+  /* background-color: var(--container-bg); */ /* Optionally, if a background is needed */
 }
+/* ========== END OF FOOTER ========== */
 
 /* ========== UTILITIES ========== */
 .text-center {
