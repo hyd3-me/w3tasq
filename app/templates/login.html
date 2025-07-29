@@ -1,23 +1,19 @@
-<!-- templates/login.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Web3 Wallet Auth</title>
-</head>
-<body>
-    <div class="container">
-        <h1>Connect with Web3 Wallet</h1>
-        
-        <button id="connectWallet">Connect Wallet</button>
-        <div id="status"></div>
-    </div>
+<!-- app/templates/login.html -->
+{% extends "base.html" %} <!-- Указываем, что наследуем base.html -->
 
-    <!-- Load ethers.js for web3 functionality -->
-    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
-    
-    <script>
+{% block title %}Login - w3tasq{% endblock %} <!-- Переопределяем заголовок -->
+
+{% block content %} <!-- Заполняем блок content -->
+<div class="login-container">
+    <h2>Connect Your Wallet</h2>
+    <p>Please connect your Web3 wallet to access the application.</p>
+    <button id="connectWallet" class="btn">Connect Wallet</button>
+    <div id="status" style="margin-top: 15px;"></div>
+</div>
+
+{% block extra_scripts %}
+<!-- Сюда можно добавить специфичный JS для страницы логина, если он был -->
+<script>
         // Check if MetaMask is available
         function checkWalletConnection() {
             const statusElement = document.getElementById('status');
@@ -108,5 +104,6 @@
             }
         });
     </script>
-</body>
-</html>
+{% endblock %}
+
+{% endblock %} <!-- Закрываем блок content -->

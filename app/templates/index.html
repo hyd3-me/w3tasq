@@ -1,32 +1,34 @@
 <!-- app/templates/index.html -->
-<!DOCTYPE html>
-<html>
-<head>
-    <title>w3tasq - Web3 Task & Note Tracker</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Подключаем CSS файл -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <div>
-                <h1>w3tasq - Web3 Task & Note Tracker</h1>
-                <div class="welcome-text">
-                    Welcome to your personal task manager!
-                </div>
-            </div>
-            <div class="user-info">
-                <div>Wallet: {{ user_address }}</div>
-                <div style="margin-top: 10px;">
-                    <a href="#" id="logoutBtn" class="logout-btn">Logout</a>
-                </div>
-            </div>
-        </div>
+{% extends "base.html" %}
 
-        <!-- Форма для создания новой задачи -->
+{% block title %}Dashboard - w3tasq{% endblock %}
+
+{% block content %}
+<div class="header">
+    <div>
+        <h1>w3tasq - Web3 Task & Note Tracker</h1>
+        <div class="welcome-text">
+            Welcome to your personal task manager!
+        </div>
+    </div>
+    <div class="user-info">
+        <div>Wallet: {{ user_address }}</div>
+        <div style="margin-top: 10px;">
+            <a href="#" id="logoutBtn" class="logout-btn">Logout</a>
+        </div>
+    </div>
+</div>
+
+<!-- Навигационное меню -->
+<nav class="section-nav">
+    <button id="showAddTaskBtn" class="nav-btn active">➕ Add Task</button>
+    <button id="showTasksBtn" class="nav-btn">📋 My Tasks</button>
+</nav>
+
+<!-- Контейнер для секций -->
+<div class="sections-container">
+    <!-- Форма для создания новой задачи -->
+    <div id="addTaskSection" class="section active">
         <div class="task-form">
             <h3>Create New Task</h3>
             <form id="taskForm">
@@ -61,17 +63,17 @@
                 </div>
             </form>
         </div>
-
-        <!-- Список задач -->
-        <div id="tasksSection">
-            <h3>Your Tasks</h3>
-            <div id="tasksContainer">
-                <p class="text-center">No tasks yet. Create your first task above!</p>
-            </div>
-        </div>
     </div>
 
-    <!-- Подключаем JavaScript файл -->
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-</body>
-</html>
+    <!-- Список задач -->
+    <div id="tasksSection" class="section">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3>Your Tasks</h3>
+            <button id="loadTasksBtn" class="btn">🔄 Refresh</button>
+        </div>
+        <div id="tasksContainer">
+            <p class="text-center">Click "Refresh" to load your tasks or switch back to "Add Task" mode.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
