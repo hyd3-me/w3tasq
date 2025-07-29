@@ -420,10 +420,47 @@ function displayTasks(tasks) {
         setTimeout(checkScroll, 100);
     }
 }
+function escapeHtml(unsafe) {
+    if (typeof unsafe !== 'string') return unsafe;
+    return unsafe
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "<")
+         .replace(/>/g, ">")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+};
+// --- Функция для переключения темы ---
+function initThemeToggle() {
+    // НЕТ document.addEventListener('DOMContentLoaded', () => { ... });
+    // Сразу выполняем логику, так как эта функция вызывается из основного DOMContentLoaded
+    
+    const toggleButton = document.getElementById('themeToggle');
+    const body = document.body;
+
+    if (toggleButton) {
+        toggleButton.addEventListener('click', () => {
+            body.classList.toggle('dark-theme');
+            // Сохраняем выбор пользователя в localStorage
+            const isDark = body.classList.contains('dark-theme');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+    }
+
+    // Проверяем сохраненную тему при загрузке страницы
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        body.classList.add('dark-theme');
+    } else if (savedTheme === 'light') {
+        body.classList.remove('dark-theme');
+    }
+    // Остальная логика инициализации темы...
+}
 
 // --- Обновляем обработчик клика на кнопке "My Tasks" ---
 document.addEventListener('DOMContentLoaded', function() {
     // ... (другие обработчики) ...
+    // Инициализируем переключатель темы
+    initThemeToggle();
     
     const showTasksBtn = document.getElementById('showTasksBtn');
     if (showTasksBtn) {
@@ -450,13 +487,3 @@ document.addEventListener('DOMContentLoaded', function() {
     // Добавляем глобальный обработчик прокрутки окна (на случай, если контейнер не прокручивается сам)
     window.addEventListener('scroll', checkScroll);
 });
-
-function escapeHtml(unsafe) {
-    if (typeof unsafe !== 'string') return unsafe;
-    return unsafe
-         .replace(/&/g, "&amp;")
-         .replace(/</g, "<")
-         .replace(/>/g, ">")
-         .replace(/"/g, "&quot;")
-         .replace(/'/g, "&#039;");
-}
