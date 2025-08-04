@@ -118,3 +118,73 @@ def get_user_tasks_cursor(user_id, cursor_id=None, limit=12):
         next_cursor = None  # No more records
 
     return tasks_to_return, next_cursor, has_more
+
+# --- NEW FUNCTION: Retrieve a task by its ID ---
+def get_task_by_id(task_id):
+    """
+    Retrieve a task instance by its ID.
+
+    Args:
+        task_id (int): The ID of the task to retrieve.
+
+    Returns:
+        tuple: (Task instance or None, message string).
+               - If task is found: (Task instance, "Task found").
+               - If task is not found: (None, "Task not found").
+               - If an error occurs: (None, "Error retrieving task").
+    """
+    try:
+        
+        # Query the database for the task with the given ID
+        task = Task.query.filter_by(id=task_id).first()
+        
+        if task:
+            return task, "Task found"
+        else:
+            return None, "Task not found"
+            
+    except Exception as e:
+        # In case of any unexpected database error
+        # Logging the error might be useful in production.
+        # print(f"Error retrieving task {task_id}: {e}")
+        return None, "Error retrieving task"
+
+# --- UPDATED FUNCTION: Authorization check for task ownership ---
+def is_user_authorized_for_task(user_id, task_id):
+    """
+    Check if a user is authorized to access (modify/delete) a specific task.
+    Authorization is granted if the task exists and belongs to the user.
+
+    Args:
+        user_id (int): The ID of the user making the request.
+        task_id (int): The ID of the task to check access for.
+
+    Returns:
+        tuple: (is_authorized: bool, message: str)
+               - (True, "Access granted") if the user owns the task.
+               - (False, "Task not found") if the task does not exist.
+               - (False, "Access denied. Task belongs to another user.") if user_id does not match.
+               - (False, "Error checking authorization") if an exception occurs.
+    """
+    try:
+        # Use the helper function to get the task
+        task, message = get_task_by_id(task_id)
+        
+        # If task is not found, deny access
+        if task is None:
+            # message from get_task_by_id will be "Task not found" or "Error retrieving task"
+            # We can refine the message here if needed, or pass it through.
+            # Let's pass a more specific message for the authorization context.
+            return False, f"Access denied. {message}"
+            
+        # If task is found, check if the user_id matches
+        if task.user_id == user_id:
+            return True, "Access granted"
+        else:
+            return False, "Access denied. Task belongs to another user."
+            
+    except Exception as e:
+        # In case of any unexpected error during the check
+        # Logging the error might be useful in production.
+        # print(f"Error checking authorization for task {task_id} by user {user_id}: {e}")
+        return False, "Error checking authorization"

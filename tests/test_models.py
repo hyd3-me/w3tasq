@@ -233,3 +233,93 @@ class TestTaskModel:
             # Check pagination for the first (and only) page
             assert next_cursor is None, "next_cursor should be None for the last page"
             assert has_more is False, "has_more should be False if all tasks fit on the first page"
+
+# tests/test_models.py
+
+# ... (существующие импорты и классы) ...
+
+class TestTaskAuthorization:
+    """Test cases for authorization checks using db_utils functions."""
+
+    def test_is_user_authorized_for_task(self, app):
+        """
+        Test the is_user_authorized_for_task helper function for various scenarios:
+        - Authorized user accessing their own task.
+        - Unauthorized user trying to access someone else's task.
+        - Non-existent task ID.
+        - Non-existent user ID.
+        """
+        with app.app_context():
+            # --- Setup: Create two users using db_utils ---
+            wallet_address_user1 = "0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6"
+            wallet_address_user2 = "0xAbCdEf123456789012345678901234567890abcd"
+            
+            user1, was_created_user1 = db_utils.get_or_create_user(wallet_address_user1)
+            user2, was_created_user2 = db_utils.get_or_create_user(wallet_address_user2)
+            
+            user1_id = user1.id
+            user2_id = user2.id
+
+            # --- Setup: Create tasks for each user using db_utils ---
+            # Create a task for user1
+            task_user1 = db_utils.create_task(
+                user_id=user1_id,
+                title='User1\'s Task',
+                description='A task belonging to user1',
+                priority=2, # MEDIUM
+                status=0    # ACTIVE
+            )
+            task_id_user1 = task_user1.id
+            
+            # Create a task for user2
+            task_user2 = db_utils.create_task(
+                user_id=user2_id,
+                title='User2\'s Task',
+                description='A task belonging to user2',
+                priority=1, # HIGH
+                status=1    # COMPLETED
+            )
+            task_id_user2 = task_user2.id
+            
+            # Define IDs for non-existent entities
+            non_existent_task_id = 999999
+            non_existent_user_id = 888888
+
+            # --- Testing the db_utils.is_user_authorized_for_task function ---
+            
+            # 1. Authorized: User1 tries to access their own task
+            is_auth_1, msg_1 = db_utils.is_user_authorized_for_task(user1_id, task_id_user1)
+            assert is_auth_1 is True
+            assert msg_1 == "Access granted"
+
+            # 2. Unauthorized: User1 tries to access User2's task
+            is_auth_2, msg_2 = db_utils.is_user_authorized_for_task(user1_id, task_id_user2)
+            assert is_auth_2 is False
+            assert msg_2 == "Access denied. Task belongs to another user."
+
+            # 3. Unauthorized: User2 tries to access User1's task
+            is_auth_3, msg_3 = db_utils.is_user_authorized_for_task(user2_id, task_id_user1)
+            assert is_auth_3 is False
+            assert msg_3 == "Access denied. Task belongs to another user."
+
+            # 4. Non-existent task: Any user tries to access a non-existent task
+            is_auth_4a, msg_4a = db_utils.is_user_authorized_for_task(user1_id, non_existent_task_id)
+            assert is_auth_4a is False
+            # Message will be prefixed with "Access denied. " by is_user_authorized_for_task
+            assert "Access denied." in msg_4a 
+            
+            is_auth_4b, msg_4b = db_utils.is_user_authorized_for_task(user2_id, non_existent_task_id)
+            assert is_auth_4b is False
+            assert "Access denied." in msg_4b
+
+            # 5. Non-existent user tries to access a real task
+            # This scenario actually tests if the real task belongs to the non-existent user,
+            # which it doesn't. So it should be False with "belongs to another user" message.
+            is_auth_5, msg_5 = db_utils.is_user_authorized_for_task(non_existent_user_id, task_id_user1)
+            assert is_auth_5 is False
+            assert msg_5 == "Access denied. Task belongs to another user."
+
+            # 6. Non-existent user and non-existent task
+            is_auth_6, msg_6 = db_utils.is_user_authorized_for_task(non_existent_user_id, non_existent_task_id)
+            assert is_auth_6 is False
+            assert "Access denied." in msg_6
