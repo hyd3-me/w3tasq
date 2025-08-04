@@ -6,7 +6,7 @@ Following TDD methodology - tests first, then implementation.
 
 from datetime import datetime
 # Import User model inside test to avoid circular imports
-from app import db_utils
+from app import db_utils # pyright: ignore[reportMissingImports]
 
 
 class TestUserModel:
@@ -127,3 +127,109 @@ class TestTaskModel:
             assert 'Task 1' in task_titles
             assert 'Task 2' in task_titles
             assert 'Task 3' in task_titles
+    
+    def test_get_user_tasks_cursor_sorting_by_priority_and_id(self, app):
+        """
+        Test that get_user_tasks_cursor sorts tasks by priority (1, 2, 3) first,
+        then by ID descending (newest first), when no cursor is provided.
+        """
+        with app.app_context():
+            # 1. Create a user
+            wallet_address = "0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b7"
+            user, was_created = db_utils.get_or_create_user(wallet_address)
+            user_id = user.id
+
+            # 2. Create tasks in an order that does NOT match the expected sorting
+            # This will verify that sorting happens in the query, not by chance
+            
+            # Create a task with low priority (should be last)
+            task_low_1 = db_utils.create_task(
+                user_id=user_id,
+                title='Task Low Priority 1',
+                priority=3, # Low
+                status=0
+            )
+            
+            # Create a task with high priority (should be first)
+            task_high_1 = db_utils.create_task(
+                user_id=user_id,
+                title='Task High Priority 1',
+                priority=1, # High
+                status=0
+            )
+            
+            # Create a task with medium priority (should be in the middle)
+            task_medium_1 = db_utils.create_task(
+                user_id=user_id,
+                title='Task Medium Priority 1',
+                priority=2, # Medium
+                status=0
+            )
+            
+            # Create another task with high priority (should be second)
+            task_high_2 = db_utils.create_task(
+                user_id=user_id,
+                title='Task High Priority 2',
+                priority=1, # High
+                status=0
+            )
+            
+            # Create another task with low priority (should be last)
+            task_low_2 = db_utils.create_task(
+                user_id=user_id,
+                title='Task Low Priority 2',
+                priority=3, # Low
+                status=0
+            )
+
+            
+            # Collect IDs to check the order (newer tasks have higher IDs)
+            # Creation order: task_low_1(id=1) -> task_high_1(id=2) -> task_medium_1(id=3) -> task_high_2(id=4) -> task_low_2(id=5)
+            # Expected order in result (priority ASC, id DESC):
+            # 1. task_high_2 (priority=1, id=4) - High Priority, newer ID
+            # 2. task_high_1 (priority=1, id=2) - High Priority, older ID
+            # 3. task_medium_1 (priority=2, id=3) - Medium Priority
+            # 4. task_low_2 (priority=3, id=5) - Low Priority, newer ID
+            # 5. task_low_1 (priority=3, id=1) - Low Priority, older ID
+
+            expected_order = [
+                task_high_2.id, # High Priority, ID 4
+                task_high_1.id, # High Priority, ID 2
+                task_medium_1.id, # Medium Priority, ID 3
+                task_low_2.id, # Low Priority, ID 5
+                task_low_1.id  # Low Priority, ID 1
+            ]
+
+            # 3. Call the function under test
+            tasks, next_cursor, has_more = db_utils.get_user_tasks_cursor(
+                user_id=user_id,
+                cursor_id=None, # First page
+                limit=10 # Large enough limit
+            )
+
+            # 4. Verify the results
+            assert len(tasks) == 5, f"Expected 5 tasks, got {len(tasks)}"
+            
+            # Check the order of task IDs
+            returned_task_ids = [task.id for task in tasks]
+            assert returned_task_ids == expected_order, f"Tasks are not in expected order. Expected {expected_order}, got {returned_task_ids}"
+            
+            # Check that tasks have the expected priorities in the correct order
+            expected_priorities_in_order = [1, 1, 2, 3, 3] # High, High, Medium, Low, Low
+            returned_priorities = [task.priority for task in tasks]
+            assert returned_priorities == expected_priorities_in_order, f"Task priorities are not in expected order. Expected {expected_priorities_in_order}, got {returned_priorities}"
+            
+            # Check that task titles correspond to the expected order
+            expected_titles_in_order = [
+                'Task High Priority 2', # ID 4
+                'Task High Priority 1', # ID 2
+                'Task Medium Priority 1', # ID 3
+                'Task Low Priority 2', # ID 5
+                'Task Low Priority 1' # ID 1
+            ]
+            returned_titles = [task.title for task in tasks]
+            assert returned_titles == expected_titles_in_order, f"Task titles are not in expected order. Expected {expected_titles_in_order}, got {returned_titles}"
+            
+            # Check pagination for the first (and only) page
+            assert next_cursor is None, "next_cursor should be None for the last page"
+            assert has_more is False, "has_more should be False if all tasks fit on the first page"

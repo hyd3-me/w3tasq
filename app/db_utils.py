@@ -1,4 +1,5 @@
 from app.models import db, User, Task # pyright: ignore[reportMissingImports]
+from sqlalchemy import or_, and_
 
 
 def get_or_create_user(wallet_address):
@@ -62,47 +63,58 @@ def get_user_tasks(user_id):
     """
     return Task.query.filter_by(user_id=user_id).order_by(Task.created_at.desc()).all() # Сортировка по дате создания, новые первые
 
-# --- НОВАЯ ФУНКЦИЯ: Получение задач с cursor-based пагинацией ---
+# --- UPDATED FUNCTION: Get tasks with cursor-based pagination and sorting ---
 def get_user_tasks_cursor(user_id, cursor_id=None, limit=12):
     """
     Get a page of tasks for a user using cursor-based pagination.
-    Assumes tasks are ordered by ID descending (newest first).
-    
+    Tasks are sorted by priority (High=1, Medium=2, Low=3) first, 
+    then by ID descending (newest first).
+
     Args:
         user_id: ID of the user whose tasks to retrieve
         cursor_id: ID of the last task seen (for pagination). 
                    If None, get the first page.
         limit: Maximum number of tasks to retrieve.
-    
+
     Returns:
         tuple: (list of Task instances, next_cursor_id, has_more)
-               - list of tasks
+               - list of tasks sorted by (priority ASC, id DESC)
                - ID of the last task in the result set (to use as next cursor)
                - boolean indicating if there are more tasks available
     """
     query = Task.query.filter_by(user_id=user_id)
-    
-    # Если курсор задан, фильтруем по ID < cursor_id
-    # Это работает, если мы сортируем по ID по убыванию
+
+    # If cursor is provided, filter tasks that come after the cursor task
+    # in the sorted list (priority ASC, id DESC)
     if cursor_id is not None:
-        query = query.filter(Task.id < cursor_id)
-    
-    # Сортируем по ID по убыванию (новые первые)
-    # Предполагаем, что ID - это автоинкрементное поле, 
-    # поэтому новые записи имеют больший ID
-    query = query.order_by(Task.id.desc())
-    
-    # Получаем на одну запись больше, чтобы понять, есть ли еще данные
+        # 1. Find the cursor task to get its priority and id
+        cursor_task = db.session.get(Task, cursor_id)
+        if cursor_task:
+            # 2. Filter tasks that:
+            #    - Have a lower priority (higher number) OR
+            #    - Have the same priority, but ID is less (i.e., it's older)
+            query = query.filter(
+                or_(
+                    Task.priority > cursor_task.priority,
+                    and_(Task.priority == cursor_task.priority, Task.id < cursor_task.id)
+                )
+            )
+
+    # Sort by priority (1, 2, 3) ascending, then by ID descending
+    # This gives priority sorting, and within each priority - from new to old
+    query = query.order_by(Task.priority.asc(), Task.id.desc())
+
+    # Get one extra record to determine if there are more records
     tasks = query.limit(limit + 1).all()
-    
+
     has_more = len(tasks) > limit
     if has_more:
-        # Убираем лишнюю запись
+        # Remove the extra record
         tasks_to_return = tasks[:-1]
-        # Курсор для следующей страницы - ID последней возвращенной записи
+        # Cursor for the next page is the ID of the last returned record
         next_cursor = tasks_to_return[-1].id if tasks_to_return else None
     else:
         tasks_to_return = tasks
-        next_cursor = None # Больше записей нет
-        
+        next_cursor = None  # No more records
+
     return tasks_to_return, next_cursor, has_more
