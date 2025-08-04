@@ -1,18 +1,23 @@
 # app/app.py
 from flask import Flask, render_template, session, redirect, url_for, request, jsonify
 from app import utils, db_utils
-from app.models import db
-from app.config import config_map
+from app.models import db # pyright: ignore[reportMissingImports]
+from app.config import config_map # pyright: ignore[reportMissingImports]
+# Import filters
+from app.template_filters import shorten_wallet_address # pyright: ignore[reportMissingImports]
 
 
 def create_app(config_name='default'):
     """Фабричная функция для создания экземпляра приложения"""
     app = Flask(__name__)
     
-    # Загружаем конфигурацию
+    # Load configuration
     app.config.from_object(config_map[config_name])
+
+    # Register custom filters
+    app.jinja_env.filters['shorten_wallet'] = shorten_wallet_address
     
-    # Инициализируем приложение с конфигом (если нужно)
+    # Initialize application with config (if needed)
     #config_map[config_name].init_app(app)
     
     # Initialize extensions
@@ -24,11 +29,11 @@ def create_app(config_name='default'):
     
     @app.route('/')
     def index():
-        # Проверяем, авторизован ли пользователь
+        # Check if user is authenticated
         if 'user_address' in session and session.get('authenticated'):
             return render_template('index.html', user_address=session.get('user_address'))
         else:
-            # Настоящий HTTP редирект на страницу логина
+            # Real HTTP redirect to login page
             return redirect(url_for('login'))
     
     @app.route('/login')
@@ -78,22 +83,20 @@ def create_app(config_name='default'):
             # Verify signature using existing utils function
             is_valid, message = utils.verify_signature(address, signature)
             
-            if is_valid:
-
-                user_db, was_created = db_utils.get_or_create_user(address)
-
-                # Store user in session
-                session['user_address'] = address
-                session['user_id'] = user_db.id
-                session['authenticated'] = True
-                
-                return jsonify({
-                    'success': True,
-                    'address': address,
-                    'message': message
-                })
-            else:
+            if not is_valid:
                 return jsonify({'error': message}), 401
+            user_db, was_created = db_utils.get_or_create_user(address)
+
+            # Store user in session
+            session['user_address'] = address
+            session['user_id'] = user_db.id
+            session['authenticated'] = True
+            
+            return jsonify({
+                'success': True,
+                'address': address,
+                'message': message
+            })
                 
         except Exception as e:
             return jsonify({'error': 'Internal server error'}), 500
@@ -102,24 +105,24 @@ def create_app(config_name='default'):
     def create_task():
         """Create a new task for authenticated user"""
         try:
-            # Проверяем аутентификацию
+            # Check authentication
             if not session.get('authenticated') or not session.get('user_id'):
                 return jsonify({'error': 'Authentication required'}), 401
             
             user_id = session['user_id']
             data = request.get_json()
             
-            # Валидация обязательных полей
+            # Validate required fields
             if not data or not data.get('title'):
                 return jsonify({'error': 'Title is required'}), 400
             
-            # Создаем задачу
+            # Create task
             task = db_utils.create_task(
                 user_id=user_id,
                 title=data['title'],
                 description=data.get('description', ''),
-                priority=data.get('priority', 3),  # По умолчанию LOW
-                status=data.get('status', 0)       # По умолчанию ACTIVE
+                priority=data.get('priority', 3),  # Default LOW
+                status=data.get('status', 0)       # Default ACTIVE
             )
             return jsonify({
                 'success': True,
@@ -135,7 +138,7 @@ def create_app(config_name='default'):
 
         """Get tasks for the authenticated user with cursor-based pagination."""
         try:
-            # Проверяем аутентификацию
+            # Check authentication
             if not session.get('authenticated') or not session.get('user_id'):
                 return jsonify({'error': 'Authentication required'}), 401
             
@@ -143,13 +146,13 @@ def create_app(config_name='default'):
 
             # --- Cursor-based Pagination ---
             try:
-                # Получаем курсор из URL
+                # Get cursor from URL
                 cursor_str = request.args.get('cursor', None)
                 
-                # Получаем limit из конфига
+                # Get limit from config
                 limit = app.config.get('TASKS_PER_PAGE', 12)
                 
-                # Преобразуем cursor в число, если он есть
+                # Convert cursor to number if it exists
                 cursor_id = None
                 if cursor_str:
                     cursor_id = int(cursor_str)
@@ -158,15 +161,15 @@ def create_app(config_name='default'):
                 cursor_id = None
                 limit = app.config.get('TASKS_PER_PAGE', 12)
             
-            # Получаем задачи и информацию для следующего курсора
+            # Get tasks and pagination info
             tasks, next_cursor_id, has_more = db_utils.get_user_tasks_cursor(
                 user_id, cursor_id, limit
             )
             
-            # Подготавливаем данные для ответа
+            # Prepare data for response
             tasks_data = [task.to_dict() for task in tasks]
             
-            # Формируем упрощенную информацию о пагинации
+            # Create simplified pagination info
             pagination_info = {
                 'has_more': has_more,
                 'next_cursor': next_cursor_id if has_more else None
@@ -178,7 +181,7 @@ def create_app(config_name='default'):
             })
             
         except Exception as e:
-            print(f"Error retrieving tasks: {e}") # Для отладки
+            print(f"Error retrieving tasks: {e}") # For debugging
             return jsonify({'error': 'Internal server error'}), 500
     
     return app

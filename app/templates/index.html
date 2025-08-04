@@ -12,23 +12,23 @@
         </div>
     </div>
     <div class="user-info">
-        <div>Wallet: {{ user_address }}</div>
+        <!-- Use custom filter to shorten wallet address -->
+        <div>{{ user_address | shorten_wallet }}</div>
         <div style="margin-top: 10px;">
-            <!-- Добавляем класс btn -->
             <a href="#" id="logoutBtn" class="btn logout-btn">Logout</a>
         </div>
     </div>
 </div>
 
-<!-- Навигационное меню -->
+<!-- Navigation menu -->
 <nav class="section-nav">
     <button id="showAddTaskBtn" class="nav-btn active">➕ Add Task</button>
     <button id="showTasksBtn" class="nav-btn">📋 My Tasks</button>
 </nav>
 
-<!-- Контейнер для секций -->
+<!-- Sections container -->
 <div class="sections-container">
-    <!-- Форма для создания новой задачи -->
+    <!-- Form for creating a new task -->
     <div id="addTaskSection" class="section active">
         <div class="task-form">
             <h3>Create New Task</h3>
@@ -67,7 +67,7 @@
         </div>
     </div>
 
-    <!-- Список задач -->
+    <!-- Tasks list -->
     <div id="tasksSection" class="section">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h3>Your Tasks</h3>

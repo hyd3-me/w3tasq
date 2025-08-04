@@ -1,4 +1,4 @@
-from app.models import db, User, Task
+from app.models import db, User, Task # pyright: ignore[reportMissingImports]
 
 
 def get_or_create_user(wallet_address):
