@@ -432,7 +432,7 @@ class TestTaskAuthorization:
         """
         with app.app_context():
             # --- Setup: Create two users using db_utils ---
-            wallet_address_user1 = "0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6"
+            wallet_address_user1 = "0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b9"
             wallet_address_user2 = "0xAbCdEf123456789012345678901234567890abcd"
             
             user1, was_created_user1 = db_utils.get_or_create_user(wallet_address_user1)

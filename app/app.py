@@ -184,6 +184,68 @@ def create_app(config_name='default'):
             print(f"Error retrieving tasks: {e}") # For debugging
             return jsonify({'error': 'Internal server error'}), 500
     
+    @app.route('/api/tasks/<int:task_id>', methods=['PATCH'])
+    def update_task_status(task_id):
+        """
+        Update the status of a specific task for the authenticated user.
+        PATCH /api/tasks/<task_id>
+        Expects JSON: {"status": 0|1|2}
+        """
+        try:
+            # 1. Check authentication
+            if not session.get('authenticated') or not session.get('user_id'):
+                return jsonify({'error': 'Authentication required'}), 401
+
+            user_id = session['user_id']
+            data = request.get_json()
+
+            # 2. Validate incoming data presence and structure
+            if not data:
+                return jsonify({'error': 'Request body must be valid JSON'}), 400
+
+            if 'status' not in data:
+                return jsonify({'error': 'Missing required field: status'}), 400
+
+            new_status = data['status']
+            # Note: Validation of the status value (e.g., is it 0, 1, or 2?) 
+            # is delegated to the db_utils.update_task_status_internal function.
+            # This avoids duplicating business logic.
+
+            # 3. Check authorization and get the task instance
+            # Use the existing db utility function for authorization and retrieval
+            authorized_result, auth_message = db_utils.is_user_authorized_for_task(user_id, task_id)
+
+            if authorized_result is False:
+                # User is not authorized (task not found or belongs to another user)
+                # Returning 404 aligns with common REST practices for this scenario.
+                return jsonify({'error': auth_message}), 404
+
+            # If authorized_result is not False, it's the Task instance
+            task_instance = authorized_result
+
+            # 4. Update the task status using the existing db utility function
+            # This function handles validation of new_status and performs the update.
+            success, update_message = db_utils.update_task_status_internal(task_instance, new_status)
+
+            if not success:
+                # 5a. Return error response if update failed (validation or DB error)
+                # The utility function should have handled session rollback on error
+                return jsonify({'error': update_message}), 400 # Use 400 for client errors like validation
+            # 5a. Return success response with updated task data
+            # The task_instance should be updated by update_task_status_internal
+            return jsonify({
+                'success': True,
+                'message': update_message, # Message from the utility function
+                'task': task_instance.to_dict() # Return the updated task
+            }), 200 # 200 OK is standard for successful PATCH       
+
+        except Exception as e:
+            # 6. Handle unexpected errors
+            # Log the error for debugging in production (consider using app.logger)
+            # print(f"Unexpected error in update_task_status: {e}") # For debugging
+            db.session.rollback() # Ensure session is clean on unexpected error
+            return jsonify({'error': 'Internal server error'}), 500
+    
     return app
 
 # Для запуска в production

@@ -1,6 +1,6 @@
 # tests/test_app.py
 import pytest
-from app import utils
+from app import utils, db_utils
 
 
 def test_index_page(client):
@@ -111,3 +111,49 @@ def test_index_page_contains_tasks_section(client):
     # Проверяем, что на странице есть заголовок или упоминание задач
     html_content = response.get_data(as_text=True)
     assert 'your tasks' in html_content.lower()
+
+def test_api_patch_task_status_updates_it(authenticated_client_for_user1, user1, task1):
+    """
+    Test that an authenticated user can update a task's status via the PATCH /api/tasks/<id> endpoint.
+    Specifically, tests updating the status to COMPLETED (1).
+    """
+    client = authenticated_client_for_user1
+    
+    #user1 = user2
+    user_id = user1.id
+    task_id = task1.id
+
+    # --- Setup: Ensure the task starts with a known status (e.g., ACTIVE=0) ---
+    # While task1 is likely ACTIVE, explicitly asserting its initial state makes the test clearer.
+    assert task1.status == 0, "Test assumes task1 starts as ACTIVE (status=0)"
+
+    # --- Action: Send PATCH request to update task status to COMPLETED (1) ---
+    patch_data = {
+        "status": 1 # TaskStatus.COMPLETED
+    }
+    # Use the correct URL scheme for your API endpoint
+    # Assuming it's /api/tasks/<task_id>
+    response = client.patch(f'/api/tasks/{task_id}', json=patch_data)
+
+    # --- Verification 1: Check HTTP response ---
+    assert response.status_code == 200, f"Expected 200 OK, got {response.status_code}. Response data: {response.get_json()}"
+
+    # Parse JSON response
+    data = response.get_json()
+    assert data is not None, "Response should contain JSON data"
+    assert data.get('success') is True, f"API should return success=True. Got: {data}"
+
+    # --- Verification 2: Check the returned task data ---
+    updated_task_data = data.get('task')
+    assert updated_task_data is not None, "Response should include 'task' data"
+    assert updated_task_data.get('id') == task_id, "Returned task ID should match"
+    assert updated_task_data.get('user_id') == user_id, "Returned task user_id should match"
+    assert updated_task_data.get('status') == 1, f"Returned task status should be updated to 1 (COMPLETED). Got: {updated_task_data.get('status')}"
+
+    # --- Verification 3: Check persistence by querying the database directly ---
+    # We need to access the app context to query the database
+    with client.application.app_context(): # client.application gives access to the Flask app instance
+        task_from_db, msg = db_utils.get_task_by_id(task_id)
+        assert task_from_db is not None, "Task should still exist in the database"
+        assert task_from_db.status == 1, f"Task status in DB should be updated to 1 (COMPLETED). Got: {task_from_db.status}"
+        assert task_from_db.user_id == user_id, "Task user_id in DB should be unchanged"
