@@ -80,14 +80,11 @@ class TestTaskModel:
         """Test retrieving all tasks for a user using db_utils function."""
         with app.app_context():
 
-            # 1. Создаем пользователя
             wallet_address = "0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6"
             user, was_created = db_utils.get_or_create_user(wallet_address)
 
             user_id = user.id
 
-            # 2. Создаем 3 задачи для этого пользователя, используя существующую (или будущую) утилиту
-            # Предположим, что db_utils.create_task уже существует или будет создана
             task1_data = {
                 'user_id': user_id,
                 'title': 'Task 1',
@@ -110,7 +107,6 @@ class TestTaskModel:
                 'status': 1 # Completed
             }
             
-            # Создаем задачи напрямую через модель, так как утилита create_task еще не реализована
             # Create a new task using db_utils function
             task1 = db_utils.create_task(**task1_data)
             task2 = db_utils.create_task(**task2_data)
@@ -233,10 +229,47 @@ class TestTaskModel:
             # Check pagination for the first (and only) page
             assert next_cursor is None, "next_cursor should be None for the last page"
             assert has_more is False, "has_more should be False if all tasks fit on the first page"
+    
+    def test_update_task_status(self, app, user1, task1):
+        """
+        Test updating the status of a task.
+        Focuses on the core logic of updating a task's status once access is confirmed.
+        Assumes authorization check (is_user_authorized_for_task) is handled separately.
+        """
+        with app.app_context():
+            # --- Setup: Get the initial status of the task ---
+            assert task1.status == 0
+            task_id = task1.id
+            user_id = user1.id
 
-# tests/test_models.py
+            # --- Action: Update the task status to COMPLETED (1) ---
+            # Assumed signature: update_task_status_internal(task_instance, new_status) -> (bool, str)
+            # It accepts an already authorized task instance.
+            new_status = 1 # COMPLETED
+            assert new_status != task1.status
+            
+            # First, check authorization and get the task (new logic)
+            is_authorized, message = db_utils.is_user_authorized_for_task(user_id, task_id)
+            
+            assert is_authorized
+            task_instance = is_authorized # is_authorized is now a Task instance
+            # Then call the update function, passing the instance
+            success, message = db_utils.update_task_status_internal(task_instance, new_status)
 
-# ... (существующие импорты и классы) ...
+            # --- Verification: Ensure the operation was successful ---
+            assert success is True, f"update_task_status_internal should succeed for authorized user. Message: {message}"
+            assert message == "Task status updated successfully" # Can check for a specific message
+
+            # --- Verification: Ensure changes are saved to the DB ---
+            # Since we passed task_instance, it should be updated already.
+            # But for reliability, query directly from the DB.
+            task_from_db, msg = db_utils.get_task_by_id(task_id)
+            assert task_from_db is not None, "Task should still exist in DB"
+            assert task_from_db.status == new_status, f"Task status in DB should be updated to {new_status}"
+            # Check that other fields haven't changed
+            assert task_from_db.title == task1.title # Or use constant 'Task 1 for User 1'
+            assert task_from_db.user_id == user_id
+
 
 class TestTaskAuthorization:
     """Test cases for authorization checks using db_utils functions."""
@@ -289,7 +322,7 @@ class TestTaskAuthorization:
             
             # 1. Authorized: User1 tries to access their own task
             is_auth_1, msg_1 = db_utils.is_user_authorized_for_task(user1_id, task_id_user1)
-            assert is_auth_1 is True
+            assert is_auth_1
             assert msg_1 == "Access granted"
 
             # 2. Unauthorized: User1 tries to access User2's task

@@ -160,9 +160,9 @@ def is_user_authorized_for_task(user_id, task_id):
         task_id (int): The ID of the task to check access for.
 
     Returns:
-        tuple: (is_authorized: bool, message: str)
-               - (True, "Access granted") if the user owns the task.
-               - (False, "Task not found") if the task does not exist.
+        tuple: (result: Task instance or bool, message: str)
+               - (Task instance, "Access granted") if the user owns the task.
+               - (False, "Access denied. Task not found") if the task does not exist.
                - (False, "Access denied. Task belongs to another user.") if user_id does not match.
                - (False, "Error checking authorization") if an exception occurs.
     """
@@ -179,7 +179,7 @@ def is_user_authorized_for_task(user_id, task_id):
             
         # If task is found, check if the user_id matches
         if task.user_id == user_id:
-            return True, "Access granted"
+            return task, "Access granted"
         else:
             return False, "Access denied. Task belongs to another user."
             
@@ -188,3 +188,58 @@ def is_user_authorized_for_task(user_id, task_id):
         # Logging the error might be useful in production.
         # print(f"Error checking authorization for task {task_id} by user {user_id}: {e}")
         return False, "Error checking authorization"
+
+# --- NEW FUNCTION: Update the status of a task ---
+def update_task_status_internal(task_instance, new_status):
+    """
+    Update the status of a task instance.
+    This function assumes the task_instance is already authorized for modification.
+    It also assumes new_status has been validated by the caller.
+
+    Args:
+        task_instance (Task): An authorized Task model instance to update.
+        new_status (int): The new status value (0=ACTIVE, 1=COMPLETED, 2=ARCHIVED).
+
+    Returns:
+        tuple: (success: bool, message: str)
+               - (True, "Task status updated successfully") if the update succeeds.
+               - (False, "Invalid task instance provided") if task_instance is not a Task instance.
+               - (False, "Invalid status value") if new_status is not in [0, 1, 2].
+               - (False, "Error updating task status") if a database error occurs.
+    """
+    try:
+        # 1. Validate inputs
+        # Check if task_instance is a valid Task model instance
+        if not isinstance(task_instance, Task):
+            return False, "Invalid task instance provided"
+        
+        # Assume new_status is validated at the API level or by the caller.
+        # However, an additional check can be added here for extra safety.
+        # Valid status values (according to your Task model)
+        VALID_STATUSES = {0, 1, 2} # ACTIVE, COMPLETED, ARCHIVED
+        if new_status not in VALID_STATUSES:
+            return False, f"Invalid status value. Must be one of {VALID_STATUSES}. Got {new_status}."
+
+        # 2. Update the task instance
+        # Update the status field
+        task_instance.status = new_status
+        # SQLAlchemy will automatically update the updated_at field on commit,
+        # if it has default=datetime.utcnow or server_default.
+        # But we can explicitly update it here if required by business logic.
+        # from datetime import datetime
+        # task_instance.updated_at = datetime.utcnow() # If the model does not do this automatically
+        
+        # 3. Commit changes to the database
+        # We use db.session, which is imported into the module.
+        
+        db.session.add(task_instance) # Not strictly necessary if the object is already tracked
+        db.session.commit()
+        
+        # 4. Return success
+        return True, "Task status updated successfully"
+        
+    except Exception as e:
+        # 5. Rollback on error and return failure
+        # print(f"Error updating task status: {e}") # For debugging
+        db.session.rollback()
+        return False, "Error updating task status"
