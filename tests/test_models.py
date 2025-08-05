@@ -7,7 +7,7 @@ Following TDD methodology - tests first, then implementation.
 from datetime import datetime
 # Import User model inside test to avoid circular imports
 from app import db_utils # pyright: ignore[reportMissingImports]
-from app.models import TaskStatus
+from app.models import TaskStatus, Task
 
 
 class TestUserModel:
@@ -312,6 +312,111 @@ class TestTaskModel:
             assert task_from_db.user_id == user_id
             # updated_at should have been updated
             assert task_from_db.updated_at > task_from_db.created_at # This depends on datetime precision and might be flaky in tests
+    
+    def test_get_user_tasks_cursor_filters_by_active_status(self, app):
+        """
+        Test that get_user_tasks_cursor only returns tasks with status=0 (ACTIVE).
+        Tasks with other statuses (e.g., ARCHIVED=2) should be excluded.
+        """
+        with app.app_context():
+            # --- Setup: Create a user ---
+            wallet_address = "0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b8"
+            user, was_created = db_utils.get_or_create_user(wallet_address)
+            user_id = user.id
+
+            # --- Setup: Create tasks with different statuses for the user ---
+            
+            # 1. Create an ACTIVE task (status=0) - should be included
+            task_active_1 = db_utils.create_task(
+                user_id=user_id,
+                title='Active Task 1',
+                description='An active task',
+                priority=2, # MEDIUM
+                status=TaskStatus.ACTIVE # 0
+            )
+            
+            # 2. Create another ACTIVE task (status=0) - should be included
+            task_active_2 = db_utils.create_task(
+                user_id=user_id,
+                title='Active Task 2',
+                description='Another active task',
+                priority=1, # HIGH
+                status=TaskStatus.ACTIVE # 0
+            )
+            
+            # 3. Create a COMPLETED task (status=1) - should be excluded
+            task_completed = db_utils.create_task(
+                user_id=user_id,
+                title='Completed Task',
+                description='A completed task',
+                priority=3, # LOW
+                status=TaskStatus.COMPLETED # 1
+            )
+            
+            # 4. Create an ARCHIVED task (status=2) - should be excluded
+            task_archived = db_utils.create_task(
+                user_id=user_id,
+                title='Archived Task',
+                description='An archived task',
+                priority=2, # MEDIUM
+                status=TaskStatus.ARCHIVED # 2
+            )
+
+            # --- Action & Verification 1: Get initial list of tasks ---
+            # Call the function under test to get tasks for the user
+            # We expect only the 2 active tasks
+            tasks_initial, next_cursor_initial, has_more_initial = db_utils.get_user_tasks_cursor(
+                user_id=user_id,
+                cursor_id=None, # First page
+                limit=10 # Large enough limit
+            )
+
+            # --- Verification 1: Check initial list contents ---
+            # Assert that only 2 tasks are returned
+            assert len(tasks_initial) == 2, f"Expected 2 active tasks, got {len(tasks_initial)}"
+            
+            # Collect the IDs of the returned tasks
+            returned_task_ids_initial = {task.id for task in tasks_initial}
+            expected_active_task_ids = {task_active_1.id, task_active_2.id}
+            
+            # Assert that the returned tasks are exactly the two active ones
+            assert returned_task_ids_initial == expected_active_task_ids, \
+                f"Returned task IDs {returned_task_ids_initial} do not match expected active task IDs {expected_active_task_ids}"
+
+            # --- Action 2: Change one ACTIVE task's status ---
+            # Use the existing update function to change task_active_1's status to ARCHIVED
+            # First, authorize (though we know it's ours)
+            # CORRECT UNPACKING based on is_user_authorized_for_task's return signature:
+            # It returns (Task_instance, "Access granted") on success.
+            authorized_result, auth_message = db_utils.is_user_authorized_for_task(user_id, task_active_1.id)
+            # Check authorization succeeded (authorized_result will be the Task instance)
+            assert authorized_result is not False, f"User should be authorized. Auth message: {auth_message}"
+            assert isinstance(authorized_result, Task)
+            # The first element IS the task instance
+            task_instance_to_archive = authorized_result 
+            
+            # Update the status
+            success, message = db_utils.update_task_status_internal(task_instance_to_archive, TaskStatus.ARCHIVED)
+            assert success, f"Archiving task should succeed. Message: {message}"
+
+            # --- Action & Verification 2: Get tasks list again ---
+            # Call the function under test again
+            tasks_after_archive, next_cursor_after, has_more_after = db_utils.get_user_tasks_cursor(
+                user_id=user_id,
+                cursor_id=None, # First page
+                limit=10 # Large enough limit
+            )
+
+            # --- Verification 2: Check list contents after archiving ---
+            # Assert that now only 1 task is returned (task_active_2)
+            assert len(tasks_after_archive) == 1, f"Expected 1 active task after archiving, got {len(tasks_after_archive)}"
+            
+            # Collect the ID of the returned task
+            returned_task_id_after = tasks_after_archive[0].id if tasks_after_archive else None
+            
+            # Assert that the returned task is the one that remained active
+            assert returned_task_id_after == task_active_2.id, \
+                f"Expected task ID {task_active_2.id}, got {returned_task_id_after}"
 
 
 class TestTaskAuthorization:

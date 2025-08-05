@@ -82,7 +82,7 @@ def get_user_tasks_cursor(user_id, cursor_id=None, limit=12):
                - ID of the last task in the result set (to use as next cursor)
                - boolean indicating if there are more tasks available
     """
-    query = Task.query.filter_by(user_id=user_id)
+    query = Task.query.filter_by(user_id=user_id, status=0)
 
     # If cursor is provided, filter tasks that come after the cursor task
     # in the sorted list (priority ASC, id DESC)
