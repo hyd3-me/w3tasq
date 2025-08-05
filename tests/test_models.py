@@ -7,6 +7,7 @@ Following TDD methodology - tests first, then implementation.
 from datetime import datetime
 # Import User model inside test to avoid circular imports
 from app import db_utils # pyright: ignore[reportMissingImports]
+from app.models import TaskStatus
 
 
 class TestUserModel:
@@ -269,6 +270,48 @@ class TestTaskModel:
             # Check that other fields haven't changed
             assert task_from_db.title == task1.title # Or use constant 'Task 1 for User 1'
             assert task_from_db.user_id == user_id
+
+    def test_archive_task(self, app, user1, task1):
+        """
+        Test archiving a task.
+        Verifies that a task's status can be updated to ARCHIVED (2).
+        """
+        with app.app_context():
+
+            # --- Setup: Get the initial status of the task ---
+            initial_status = task1.status
+            task_id = task1.id
+            user_id = user1.id
+
+            # Ensure the task is not already archived for a meaningful test
+            assert initial_status != TaskStatus.ARCHIVED, "Task should not start as archived"
+
+            # --- Action: Archive the task ---
+            # Use the existing authorization and update logic
+            authorized_result, message = db_utils.is_user_authorized_for_task(user_id, task_id)
+            
+            assert authorized_result, "User should be authorized to archive their own task"
+            task_instance = authorized_result # authorized_result is the Task instance
+            
+            # Update the task status to ARCHIVED (2)
+            success, message = db_utils.update_task_status_internal(task_instance, TaskStatus.ARCHIVED)
+
+            # --- Verification: Ensure the operation was successful ---
+            assert success is True, f"Archiving task should succeed. Message: {message}"
+            assert message == "Task status updated successfully"
+
+            # --- Verification: Ensure changes are saved to the DB ---
+            # Query the task directly from the database to confirm persistence
+            task_from_db, msg = db_utils.get_task_by_id(task_id)
+            assert task_from_db is not None, "Task should still exist in DB after archiving"
+            assert task_from_db.status == TaskStatus.ARCHIVED, f"Task status in DB should be {TaskStatus.ARCHIVED} (ARCHIVED)"
+            assert task_from_db.status != initial_status, "Task status should have changed from its initial value"
+            
+            # Verify other attributes remain unchanged
+            assert task_from_db.title == task1.title
+            assert task_from_db.user_id == user_id
+            # updated_at should have been updated
+            assert task_from_db.updated_at > task_from_db.created_at # This depends on datetime precision and might be flaky in tests
 
 
 class TestTaskAuthorization:
