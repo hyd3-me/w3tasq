@@ -328,12 +328,13 @@ a.logout-btn:hover,
 
 /* Container for the task list with scrolling */
 #tasksContainer {
-  max-height: 600px;
-  overflow-y: auto;
+  /* max-height: 600px; */
+  /* overflow-y: auto; */
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   padding: 10px;
   background-color: var(--card-bg);
+  margin-bottom: 20px;
 }
 
 /* Style for individual task */
@@ -348,21 +349,26 @@ a.logout-btn:hover,
 /* Left borders by priority */
 .task-item.priority-1 {
   border-left: 4px solid var(--priority-1-border);
-  background-color: var(--priority-1-bg);
+  /* background-color: var(--priority-1-bg); */
 }
 .task-item.priority-2 {
   border-left: 4px solid var(--priority-2-border);
-  background-color: var(--priority-2-bg);
+  /* background-color: var(--priority-2-bg); */
 }
 .task-item.priority-3 {
   border-left: 4px solid var(--priority-3-border);
-  background-color: var(--priority-3-bg);
+  /* background-color: var(--priority-3-bg); */
 }
 
 /* Headers and text inside tasks */
 .task-item h4 {
+  /* --- NEW: Prevent horizontal overflow in titles --- */
+  overflow-wrap: break-word;
+  word-break: break-word;
   color: var(--text-color);
   margin-top: 0;
+  /* Prevent horizontal scrollbar on the description itself */
+    overflow-x: hidden; 
 }
 .task-item p {
   color: var(--text-color);
@@ -408,6 +414,7 @@ a.logout-btn:hover,
 #taskDeadline {
   background-color: var(--input-bg);
   color: var(--text-color);
+  width: 100%;
 }
 #taskDeadline::-webkit-calendar-picker-indicator {
   /* Calendar icon is usually visible in light theme, no filter needed */
@@ -563,4 +570,28 @@ footer {
     /* Apply the animation */
     animation: taskSlideOutLeft 0.6s ease-in-out forwards;
     /* forwards means the element will stay in the state of the last frame of the animation */
+}
+
+/* Preserve formatting (spaces, line breaks) in task descriptions */
+.task-description {
+    /* white-space: pre-line; - preserves line breaks (\n -> <br>), 
+       but collapses multiple spaces into one. 
+       Good for normal text with paragraphs. */
+    /* white-space: pre-wrap; - preserves line breaks (\n -> <br>) 
+       and multiple spaces, but allows wrapping of long words. 
+       Better preserves original formatting, including indentation with spaces. */
+    white-space: pre-wrap; 
+    /* Allow long words/strings to break and wrap onto the next line */
+    overflow-wrap: break-word; 
+    /* Alternative (more aggressive): Break words at any character if necessary */
+    word-break: break-word; /* или break-all для еще более агрессивного переноса */
+    /* Prevent horizontal scrollbar on the description itself */
+    overflow-x: hidden; 
+
+    /* Optionally: add padding/margin for better visual separation */
+    margin: 10px 0;
+    border-radius: 4px;
+    /* border-left: 2px solid #ccc; */ /* Thin left border as a visual separator */
+    /* overflow-x: auto; /* Add horizontal scrolling if a line is too long */
+    max-width: 100%; /* Constrain width */
 }

@@ -52,7 +52,7 @@ function formatTaskHtml(task) {
             <input type="checkbox" id="task-complete-checkbox-${task.id}" class="task-complete-checkbox" data-task-id="${task.id}"${checkboxCheckedAttr}>
             ${escapeHtml(task.title)}
             </h4>
-            ${task.description ? `<p>${escapeHtml(task.description)}</p>` : ''}
+            ${task.description ? `<hr style="border: 0; height: 1px; background: var(--border-color); margin: 10px 0;"><p class="task-description">${escapeHtml(task.description)}</p>` : ''}
             <div style="display: flex; justify-content: space-between; font-size: 0.9em; color: #666;">
                 <span>Priority: ${priorityText}</span>
                 <span>Created: ${createdAtStr}</span>
@@ -228,12 +228,6 @@ function displayTasks(tasks) {
     // Attach event listeners to the newly rendered checkboxes
     attachTaskCheckboxListeners();
 
-    // If there are more tasks, add scroll listener
-    if (paginationState.has_more_tasks) {
-        container.addEventListener('scroll', checkScroll);
-        // Also check immediately after the first load
-        setTimeout(checkScroll, 100);
-    }
 }
 
 // --- Function to append tasks to the end of the list ---
@@ -308,28 +302,41 @@ function loadUserTasks(reset_cursor = true) {
         });
 }
 
-// --- Function to check if more tasks need to be loaded ---
-function checkScroll() {
+// --- UPDATED FUNCTION: Check if we need to load more tasks based on window scroll ---
+function checkWindowScroll() {
+    // Предполагаем, что пагинация управляется глобальным объектом paginationState
     if (paginationState.is_loading || !paginationState.has_more_tasks) return;
 
     const container = document.getElementById('tasksContainer');
     if (!container) return;
 
-    // Check if we have scrolled to the end of the container
-    // Use getBoundingClientRect for precise calculation
-    const rect = container.getBoundingClientRect();
-    const isVisible = rect.top < window.innerHeight && rect.bottom >= 0;
+    // --- Logic 1: Check if we are near the bottom of the page ---
+    // This checks the distance from the current scroll position to the bottom of the document
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
 
-    // Alternative: load when the user approaches the end
-    // Check how much the container is scrolled
-    const scrollTop = container.scrollTop;
-    const scrollHeight = container.scrollHeight;
-    const clientHeight = container.clientHeight;
+    // If we are within N pixels of the bottom of the document, load more
+    const distanceFromBottom = documentHeight - (scrollTop + windowHeight);
+    const thresholdPixels = 100; // pixels from the bottom
 
-    // If less than 100px to the end, load more
-    if (scrollHeight - scrollTop - clientHeight < 100) {
+    if (distanceFromBottom <= thresholdPixels) {
+        loadMoreTasks();
+        return; // Exit to prevent multiple calls
+    }
+
+    // --- Logic 2: Alternative - Check distance to the bottom of the tasks container ---
+    // Sometimes more precise if you want to trigger loading before reaching the absolute page bottom
+    /*
+    const containerRect = container.getBoundingClientRect();
+    const containerBottomRelativeToViewport = containerRect.bottom; // Bottom edge of container in viewport
+    const viewportHeight = window.innerHeight;
+
+    // If the bottom of the container is within N pixels of the bottom of the viewport
+    if ((viewportHeight - containerBottomRelativeToViewport) < thresholdPixels) {
         loadMoreTasks();
     }
+    */
 }
 
 // --- Function to load the next batch of tasks ---
@@ -446,7 +453,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Add global scroll handler (in case the container itself is not scrollable)
-    window.addEventListener('scroll', checkScroll);
+    window.addEventListener('scroll', checkWindowScroll);
 });
 
 // --- Function to handle the change event on a task completion checkbox ---
