@@ -545,21 +545,22 @@ footer {
 }
 
 /* ========== TASK FINALIZATION ANIMATION ========== */
-/* Style for the animation to fade out a completed task */
-@keyframes taskFadeOutAndShrink {
+/* Style for the animation to slide a completed task out to the left */
+@keyframes taskSlideOutLeft {
     0% {
         opacity: 1;
-        transform: scale(1);
+        transform: translateX(0); /* Start at original position */
     }
     100% {
         opacity: 0;
-        transform: scale(0.8); /* Slightly shrink */
+        transform: translateX(-100vw); /* Move fully off-screen to the left */
+        /* transform: translateX(calc(-100% - 20px)); */ /* Alternative: Move relative to its own width */
     }
 }
 
-/* Class applied to trigger the animation */
+/* Class applied to trigger the slide-out animation */
 .task-finalize-animation {
     /* Apply the animation */
-    animation: taskFadeOutAndShrink 0.6s ease-out forwards;
-    /* forwards means the element will stay in the state of the last frame of the animation (invisible and shrunk) */
+    animation: taskSlideOutLeft 0.6s ease-in-out forwards;
+    /* forwards means the element will stay in the state of the last frame of the animation */
 }

@@ -49,7 +49,7 @@ function formatTaskHtml(task) {
     return `
         <div class="task-item ${priorityClass}">
             <h4>
-            <input type="checkbox" class="task-complete-checkbox" data-task-id="${task.id}"${checkboxCheckedAttr}>
+            <input type="checkbox" id="task-complete-checkbox-${task.id}" class="task-complete-checkbox" data-task-id="${task.id}"${checkboxCheckedAttr}>
             ${escapeHtml(task.title)}
             </h4>
             ${task.description ? `<p>${escapeHtml(task.description)}</p>` : ''}
@@ -281,7 +281,7 @@ function loadUserTasks(reset_cursor = true) {
     if (reset_cursor) {
         paginationState.current_cursor = null;
         paginationState.has_more_tasks = true;
-        paginationState.is_loading = false;
+        paginationState.is_loading = true;
         container.innerHTML = '<div class="loading">Loading tasks...</div>';
     }
 
@@ -341,6 +341,8 @@ function loadMoreTasks() {
     if (!container) {
         paginationState.is_loading = false;
         return;
+    } else {
+        paginationState.is_loading = true;
     }
 
     // Show loading indicator at the bottom
