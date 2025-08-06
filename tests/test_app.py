@@ -119,7 +119,6 @@ def test_api_patch_task_status_updates_it(authenticated_client_for_user1, user1,
     """
     client = authenticated_client_for_user1
     
-    #user1 = user2
     user_id = user1.id
     task_id = task1.id
 

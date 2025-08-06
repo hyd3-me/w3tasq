@@ -41,9 +41,17 @@ function formatTaskHtml(task) {
         default: priorityText = `Priority ${task.priority}`;
     }
 
+    // Determine if the task is completed for initial UI state
+    const isCompleted = task.status === 1;
+    const checkboxCheckedAttr = isCompleted ? ' checked' : '';
+    const taskCompletedClass = isCompleted ? ' completed' : ''; // Add class if completed
+
     return `
         <div class="task-item ${priorityClass}">
-            <h4>${escapeHtml(task.title)}</h4>
+            <h4>
+            <input type="checkbox" class="task-complete-checkbox" data-task-id="${task.id}"${checkboxCheckedAttr}>
+            ${escapeHtml(task.title)}
+            </h4>
             ${task.description ? `<p>${escapeHtml(task.description)}</p>` : ''}
             <div style="display: flex; justify-content: space-between; font-size: 0.9em; color: #666;">
                 <span>Priority: ${priorityText}</span>
@@ -217,6 +225,9 @@ function displayTasks(tasks) {
 
     container.innerHTML = tasksHtml;
 
+    // Attach event listeners to the newly rendered checkboxes
+    attachTaskCheckboxListeners();
+
     // If there are more tasks, add scroll listener
     if (paginationState.has_more_tasks) {
         container.addEventListener('scroll', checkScroll);
@@ -246,6 +257,9 @@ function appendTasks(tasks) {
 
     // Add HTML to the end of the container
     container.insertAdjacentHTML('beforeend', tasksHtml);
+
+    // Attach event listeners to the newly appended checkboxes
+    attachTaskCheckboxListeners();
 
     // If there are no more tasks, show a message
     if (!paginationState.has_more_tasks) {
@@ -432,3 +446,169 @@ document.addEventListener('DOMContentLoaded', function () {
     // Add global scroll handler (in case the container itself is not scrollable)
     window.addEventListener('scroll', checkScroll);
 });
+
+// --- Function to handle the change event on a task completion checkbox ---
+function handleTaskCheckboxChange(event) {
+    /**
+     * Handles the logic when a user clicks the completion checkbox for a task.
+     * 1. Immediately disables the checkbox to prevent double-clicks.
+     * 2. Determines the new status (0=ACTIVE, 1=COMPLETED).
+     * 3. Shows a loading indicator.
+     * 4. Sends a PATCH request to update the task status on the server.
+     * 5. On success: Updates the UI to reflect completion (strikethrough, opacity).
+     * 6. On error: Reverts the checkbox state and shows an error message.
+     * 7. Re-enables the checkbox in case of error or for allowing status toggle.
+     */
+    const checkbox = event.target; // The checkbox that triggered the event
+
+    // --- Immediate UI Feedback ---
+    // 1. Disable the checkbox instantly to prevent multiple rapid clicks
+    checkbox.disabled = true;
+
+    const taskId = checkbox.dataset.taskId;
+    const isChecked = checkbox.checked;
+
+    // Determine the numeric status to send (0=ACTIVE, 1=COMPLETED)
+    const statusToSend = isChecked ? 1 : 0;
+
+    // Find the parent task item container
+    const taskItem = checkbox.closest('.task-item');
+    if (!taskItem) {
+        console.error('Task item container not found for checkbox');
+        return;
+    }
+
+
+
+    // 2. Show loading indicator within the task item
+    const spinner = taskItem.querySelector('.task-loading-spinner');
+    if (spinner) {
+        spinner.style.display = 'block';
+    }
+
+    // --- Send Update Request ---
+    fetch(`/api/tasks/${taskId}`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: statusToSend })
+    })
+    .then(response => {
+        // Remove loading indicator regardless of outcome
+        if (spinner) spinner.style.display = 'none';
+
+        if (!response.ok) {
+            // If HTTP status is not 2xx, attempt to parse error JSON
+            return response.json().then(err => Promise.reject(err));
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (!data.success) {
+            // --- API returned success=false ---
+            throw new Error(data.error || 'Unknown error from server');
+            }
+        // --- Success Path ---
+        console.log(`Task ${taskId} status updated to ${statusToSend} on server.`);
+
+        // Update the visual state of the task item based on the new status
+        if (statusToSend === 1) {
+            // Mark as completed: Add visual styles
+            taskItem.classList.add('completed');
+            // Optional: Fade out and remove task from the list
+            finalizeTaskCompletion(taskItem);
+            // Better approach: Reload the task list to respect filtering
+            // This ensures completed tasks are removed from the "active tasks" view
+            // loadUserTasks(true); // true = reset cursor and reload first page
+
+        } else {
+            // Mark as active (undo completion): Remove visual styles
+            taskItem.classList.remove('completed');
+            // If we were reloading on completion, we might want to reload on un-completion too
+            // to ensure it reappears correctly if filtering changes. For now, just update UI.
+        }
+
+        // Keep checkbox enabled if we allow toggling back.
+        // If checkbox is kept disabled after completion, user cannot undo easily.
+        // Decision: Keep enabled for flexibility.
+        // checkbox.disabled = false;
+    })
+    .catch(error => {
+        // --- Error Path ---
+        console.error('Error updating task status:', error);
+
+        // 1. Revert UI changes made optimistically or due to state mismatch
+        checkbox.checked = !isChecked; // Undo the checkbox change
+        if (isChecked) {
+            taskItem.classList.remove('completed'); // Undo strikethrough if it was checked
+        } else {
+            taskItem.classList.add('completed'); // Reinstate strikethrough if it was unchecked
+        }
+
+        // 2. Re-enable the checkbox so the user can try again
+        checkbox.disabled = false;
+
+        // 3. Inform the user about the error
+        alert('Error updating task status: ' + (error.message || 'Unknown error'));
+
+    });
+    // Note: There is no 'finally' block here to re-enable the checkbox,
+    // as re-enabling is handled explicitly in both success and error paths.
+    // This allows us to keep the checkbox disabled after a successful completion
+    // if desired, or re-enable it for toggling, based on specific logic.
+}
+
+// --- Function to attach event listeners to task checkboxes ---
+function attachTaskCheckboxListeners() {
+    /**
+     * Attaches the 'change' event listener to all task completion checkboxes
+     * that do not already have a listener attached.
+     * This prevents duplicate listeners when new tasks are appended.
+     */
+    document.querySelectorAll('.task-complete-checkbox').forEach(checkbox => {
+        // Check if a listener has already been attached using a data attribute
+        if (!checkbox.dataset.listenerAttached) {
+            // Attach the named event handler function
+            checkbox.addEventListener('change', handleTaskCheckboxChange);
+            // Mark the checkbox to prevent re-attaching the listener
+            checkbox.dataset.listenerAttached = 'true';
+        }
+    });
+}
+// --- NEW FUNCTION: Finalize the visual removal of a completed task ---
+/**
+ * Applies a fade-out animation to a task item and removes it from the DOM after the animation completes.
+ * Provides visual feedback that a completed task is being removed from the list.
+ * @param {HTMLElement} taskItemElement - The .task-item DOM element to animate and remove.
+ */
+function finalizeTaskCompletion(taskItemElement) {
+    /**
+     * Handles the smooth visual disappearance of a task marked as completed.
+     * 1. Adds a CSS class that triggers a fade-out/shrink animation.
+     * 2. Waits for the animation to finish (using setTimeout).
+     * 3. Removes the task element from the DOM.
+     */
+    if (!taskItemElement) {
+        console.warn('finalizeTaskCompletion called with null/undefined taskItemElement');
+        return;
+    }
+
+    // Duration should match the CSS animation duration for consistency
+    const animationDurationMs = 639; // milliseconds
+
+    // 1. Add the CSS class to start the animation
+    taskItemElement.classList.add('task-finalize-animation');
+
+    // 2. Set a timer to remove the element after the animation is expected to finish
+    setTimeout(() => {
+        // 3. Remove the element from the DOM
+        // Check if element is still connected before removing (good practice)
+        if (taskItemElement.isConnected) {
+            taskItemElement.remove();
+            console.log('Task item removed from DOM after animation.');
+        } else {
+            console.log('Task item was already removed from DOM.');
+        }
+    }, animationDurationMs);
+}

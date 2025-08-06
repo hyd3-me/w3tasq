@@ -514,3 +514,52 @@ footer {
   font-weight: 500; /* Make text slightly bolder for better readability */
 }
 /* ========== END OF DARK THEME SPECIFIC ENHANCEMENTS ========== */
+
+/* Styles for the task completion checkbox */
+.task-complete-checkbox {
+    margin-right: 10px; /* Spacing to the right of the checkbox */
+    transform: scale(1.2); /* Slightly enlarge for better visibility */
+    cursor: pointer;
+}
+
+/* Styles for a "completed" task */
+.task-item.completed {
+    opacity: 0.7; /* Make semi-transparent */
+    text-decoration: line-through; /* Strikethrough the title */
+    color: var(--text-light); /* Lighter text color */
+}
+
+/* Styles for the inline loading spinner within a task */
+.task-loading-spinner {
+    display: none; /* Hidden by default */
+    font-size: 0.8em;
+    color: var(--text-light);
+    margin-top: 5px;
+}
+
+/* Styles for the task item while it's being updated */
+.task-item.task-updating {
+    /* Visual cue that interaction is disabled */
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+/* ========== TASK FINALIZATION ANIMATION ========== */
+/* Style for the animation to fade out a completed task */
+@keyframes taskFadeOutAndShrink {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.8); /* Slightly shrink */
+    }
+}
+
+/* Class applied to trigger the animation */
+.task-finalize-animation {
+    /* Apply the animation */
+    animation: taskFadeOutAndShrink 0.6s ease-out forwards;
+    /* forwards means the element will stay in the state of the last frame of the animation (invisible and shrunk) */
+}
