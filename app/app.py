@@ -1,4 +1,3 @@
-# app/app.py
 import logging
 from logging.handlers import RotatingFileHandler
 from flask import Flask, render_template, session, redirect, url_for, request, jsonify
@@ -7,12 +6,10 @@ from app.models import db
 from app.config import config_map
 from app.template_filters import shorten_wallet_address
 
-
 app_logger = logging.getLogger('w3tasq.app')
 
-
 def create_app(config_name='default'):
-    """Фабричная функция для создания экземпляра приложения"""
+    """Factory function to create an application instance"""
     app = Flask(__name__)
     
     # Load configuration
@@ -194,7 +191,6 @@ def create_app(config_name='default'):
     
     @app.route('/api/tasks', methods=['GET'])
     def get_user_tasks():
-
         """Get tasks for the authenticated user with cursor-based pagination."""
         app_logger.debug("Processing task retrieval")
         try:
@@ -320,7 +316,7 @@ def create_app(config_name='default'):
     
     return app
 
-# Для запуска в production
+# For running in production
 if __name__ == '__main__':
     app = create_app(config_name='testing')
     app.run(debug=True)

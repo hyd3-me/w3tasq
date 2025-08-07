@@ -1,7 +1,6 @@
 import logging
-from app.models import db, User, Task # pyright: ignore[reportMissingImports]
+from app.models import db, User, Task
 from sqlalchemy import or_, and_
-
 
 # Set up logger
 logger = logging.getLogger('w3tasq.db_utils')
@@ -60,13 +59,11 @@ def get_user_tasks(user_id):
     """
     Get all tasks for a specific user.
     Args:
-        db: SQLAlchemy database instance
-        Task: Task model class
         user_id: ID of the user whose tasks to retrieve
     Returns:
         list: List of Task instances
     """
-    return Task.query.filter_by(user_id=user_id).order_by(Task.created_at.desc()).all() # Сортировка по дате создания, новые первые
+    return Task.query.filter_by(user_id=user_id).order_by(Task.created_at.desc()).all() # Sort by creation date, newest first
 
 # --- UPDATED FUNCTION: Get tasks with cursor-based pagination and sorting ---
 def get_user_tasks_cursor(user_id, cursor_id=None, limit=12):

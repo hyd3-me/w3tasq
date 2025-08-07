@@ -1,4 +1,3 @@
-# app/utils.py
 import logging
 import secrets
 from datetime import datetime, timedelta
@@ -13,7 +12,7 @@ import private_data
 # Set up logger
 logger = logging.getLogger('w3tasq.utils')
 
-# Временное хранилище для challenge (в production лучше использовать Redis)
+# Temporary storage for challenges (use Redis in production)
 CHALLENGES = {}
 
 def generate_challenge_message(address):
@@ -129,11 +128,11 @@ def get_secret_key():
     """
     Get secret key from private_data or generate a temporary one
     """
-    # Проверяем, есть ли SECRET_KEY в private_data
+    # Check if SECRET_KEY exists in private_data
     logger.debug("Retrieving secret key")
     if private_data and hasattr(private_data, 'SECRET_KEY'):
         secret_key = private_data.SECRET_KEY
-        # Проверяем, не является ли это placeholder значением
+        # Check if it's not a placeholder value
         if secret_key and not secret_key.startswith('your-super-secret'):
             logger.info("Using secret key from private_data")
             return secret_key

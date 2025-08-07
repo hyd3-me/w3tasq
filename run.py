@@ -2,12 +2,12 @@
 from app.app import create_app
 from app.config import FLASK_ENV
 
-# Получаем режим из переменной FLASK_ENV, по умолчанию 'development'
+# Set configuration mode from FLASK_ENV (defaults to 'development')
 config_name = FLASK_ENV
 
-# Создаем экземпляр приложения
+# Initialize Flask application
 app = create_app(config_name=config_name)
 
 if __name__ == '__main__':
-    # Запускаем приложение (только для разработки/тестирования)
+    # Run server for development or testing
     app.run(host='127.0.0.1', port=5000, debug=config_name != 'production')

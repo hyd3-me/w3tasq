@@ -1,9 +1,6 @@
-# app/config.py
 from app import utils
 
-
 FLASK_ENV = 'development'
-
 
 class Config:
     """Base configuration class."""
@@ -22,7 +19,7 @@ class Config:
 class DevelopmentConfig(Config):
     """Development configuration."""
     DEBUG = True
-    # Для разработки используем путь к файлу БД из utils
+    # Use database file path from utils for development
     SQLALCHEMY_DATABASE_URI = f"sqlite:///{utils.get_database_path()}"
     # Logging settings for development
     LOG_LEVEL = 'DEBUG'
@@ -36,9 +33,9 @@ class DevelopmentConfig(Config):
 class TestingConfig(Config):
     """Testing configuration."""
     TESTING = True
-    # Для тестов используем in-memory базу
+    # Use in-memory database for tests
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
-    TASKS_PER_PAGE = 5 # Меньше для скорости тестов
+    TASKS_PER_PAGE = 5 # Smaller for faster tests
     # Logging settings for testing
     LOG_LEVEL = 'ERROR'  # Minimal logs to avoid cluttering test output
     LOG_TO_FILE = True
@@ -48,7 +45,7 @@ class TestingConfig(Config):
 class ProductionConfig(Config):
     """Production configuration."""
     DEBUG = False
-    # В production лучше явно задать URI или получить из env
+    # In production, explicitly set URI or get from environment
     SQLALCHEMY_DATABASE_URI = f"sqlite:///{utils.get_database_path()}"
     # Logging settings for production
     LOG_LEVEL = 'INFO'
@@ -56,7 +53,6 @@ class ProductionConfig(Config):
     LOG_FILE = utils.join_path(utils.get_source_dir(), 'logs', 'w3tasq.log')
     LOG_MAX_BYTES = 1 * 1024 * 1024  # 1 MB per log file
     LOG_BACKUP_COUNT = 3  # Keep 5 backup files
-    
 
 config_map = {
     'development': DevelopmentConfig,
