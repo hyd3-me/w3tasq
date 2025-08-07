@@ -1,5 +1,5 @@
 # app/config.py
-from app import utils # Предполагаем, что utils доступны
+from app import utils
 
 
 FLASK_ENV = 'development'
@@ -22,7 +22,6 @@ class Config:
 class DevelopmentConfig(Config):
     """Development configuration."""
     DEBUG = True
-    
     # Для разработки используем путь к файлу БД из utils
     SQLALCHEMY_DATABASE_URI = f"sqlite:///{utils.get_database_path()}"
     # Logging settings for development

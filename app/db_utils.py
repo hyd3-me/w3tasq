@@ -1,6 +1,10 @@
+import logging
 from app.models import db, User, Task # pyright: ignore[reportMissingImports]
 from sqlalchemy import or_, and_
 
+
+# Set up logger
+logger = logging.getLogger('w3tasq.db_utils')
 
 def get_or_create_user(wallet_address):
     """
@@ -48,6 +52,7 @@ def create_task(user_id, title, description=None, priority=3, status=0):
     # Add to database
     db.session.add(task)
     db.session.commit()
+    # logger.debug(f"task created. id: {task.id}")
     
     return task
 
