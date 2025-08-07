@@ -31,7 +31,7 @@ function formatTaskHtml(task) {
         }
     }
 
-    const priorityClass = `priority-${task.priority}`;
+    // const priorityClass = `priority-${task.priority}`;
 
     let priorityText = 'Unknown';
     switch (task.priority) {
@@ -47,17 +47,21 @@ function formatTaskHtml(task) {
     const taskCompletedClass = isCompleted ? ' completed' : ''; // Add class if completed
 
     return `
-        <div class="task-item ${priorityClass}">
+        <div class="task-item priority-${task.priority}${taskCompletedClass}" data-task-id="${task.id}">
             <h4>
             <input type="checkbox" id="task-complete-checkbox-${task.id}" class="task-complete-checkbox" data-task-id="${task.id}"${checkboxCheckedAttr}>
             ${escapeHtml(task.title)}
             </h4>
-            ${task.description ? `<hr style="border: 0; height: 1px; background: var(--border-color); margin: 10px 0;"><p class="task-description">${escapeHtml(task.description)}</p>` : ''}
-            <div style="display: flex; justify-content: space-between; font-size: 0.9em; color: #666;">
+            ${task.description ? `<p>${escapeHtml(task.description)}</p>` : ''}
+            <div class="task-meta">
                 <span>Priority: ${priorityText}</span>
                 <span>Created: ${createdAtStr}</span>
             </div>
             ${task.deadline ? `<div style="font-size: 0.8em; color: #888; margin-top: 5px;">Deadline: ${new Date(task.deadline).toLocaleString()}</div>` : ''}
+            <!-- Loading indicator for task update -->
+            <div class="task-loading-spinner" style="display: none; font-size: 0.8em; color: #666; margin-top: 5px;">
+                Updating...
+            </div>
         </div>
     `;
 }
@@ -304,7 +308,7 @@ function loadUserTasks(reset_cursor = true) {
 
 // --- UPDATED FUNCTION: Check if we need to load more tasks based on window scroll ---
 function checkWindowScroll() {
-    // Предполагаем, что пагинация управляется глобальным объектом paginationState
+    // Assume pagination is managed by the global paginationState object
     if (paginationState.is_loading || !paginationState.has_more_tasks) return;
 
     const container = document.getElementById('tasksContainer');

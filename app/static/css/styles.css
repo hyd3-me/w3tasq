@@ -1,11 +1,9 @@
-/* app/static/css/styles.css */
 /* General styles for the application with dark theme support */
 
-/* ========== LIGHT THEME (default) - Updated "warm" version ========== */
+/* ========== THEME VARIABLES ========== */
+/* Light theme (default) - Updated "warm" version */
 :root {
-  /* --- Backgrounds --- */
-  /* Instead of harsh white (#ffffff) and gray (#f5f5f5),
-     use soft, slightly warm shades */
+  /* Backgrounds: Use soft, slightly warm shades instead of harsh white/gray */
   --bg-color: #f8f9fa;           /* Very light gray, almost white, but softer */
   --container-bg: #ffffff;       /* Pure white for containers */
   --card-bg: #f1f3f5;            /* Light gray for cards/forms */
@@ -14,69 +12,75 @@
   --priority-2-bg: #fff3bf;      /* Light yellow */
   --priority-3-bg: #e7f5ff;      /* Light blue/gray */
 
-  /* --- Text Colors --- */
-  /* Instead of harsh black, use dark gray */
+  /* Text Colors: Use dark gray instead of harsh black */
   --text-color: #212529;         /* Dark gray (closer to black, but softer) */
   --text-light: #495057;         /* Medium-dark gray for secondary text */
-  --text-inverted: #ffffff;      /* Still white for text on buttons */
+  --text-inverted: #ffffff;      /* White for text on buttons */
 
-  /* --- Borders --- */
-  /* Softer, neutral grays */
+  /* Borders: Softer, neutral grays */
   --border-color: #dee2e6;       /* Light gray */
   --border-card: #ced4da;        /* Medium-light gray */
 
-  /* --- Primary Colors (accents) - slightly desaturated for harmony --- */
-  --primary-color: #3b82f6;      /* Desaturated blue (instead of #007cba) */
+  /* Primary Colors (accents): Slightly desaturated for harmony */
+  --primary-color: #3b82f6;      /* Desaturated blue */
   --primary-hover: #2563eb;      /* Darker on hover */
-  --secondary-color: #6c757d;    /* Gray (remains as is) */
-  --success-color: #10b981;      /* Desaturated green (instead of #28a745) */
-  --warning-color: #f59e0b;      /* Desaturated orange (instead of #ffc107) */
-  --danger-color: #ef4444;       /* Desaturated red (instead of #dc3545) */
-  --info-color: #0ea5e9;         /* Desaturated blue (instead of #17a2b8) */
+  --secondary-color: #6c757d;    /* Gray */
+  --success-color: #10b981;      /* Desaturated green */
+  --warning-color: #f59e0b;      /* Desaturated orange */
+  --danger-color: #ef4444;       /* Desaturated red */
+  --info-color: #0ea5e9;         /* Desaturated blue */
 
-  /* --- Button Colors --- */
+  /* Button Colors */
   --btn-primary-bg: var(--primary-color);
   --btn-primary-hover: var(--primary-hover);
   --btn-primary-text: var(--text-inverted);
   --btn-danger-bg: var(--danger-color);
-  --btn-danger-hover: #dc2626; /* Darker */
+  --btn-danger-hover: #dc2626;   /* Darker */
   --btn-danger-text: var(--text-inverted);
   --btn-secondary-bg: var(--secondary-color);
   --btn-secondary-hover: #5a6268; /* Darker */
   --btn-secondary-text: var(--text-inverted);
 
-  /* --- Priority Borders (more saturated for contrast on light) --- */
-  --priority-1-border: #ef4444; /* Red */
-  --priority-2-border: #f59e0b; /* Yellow/Orange */
-  --priority-3-border: #3b82f6; /* Blue */
+  /* Priority Borders: More saturated for contrast on light */
+  --priority-1-border: #ef4444;
+  --priority-2-border: #f59e0b;
+  --priority-3-border: #3b82f6;
 
-  /* --- Other --- */
+  /* Priority Title Backgrounds: Slight transparency for gradient effect in task headers */
+  --priority-1-title-bg: rgba(239, 68, 68, 0.1); /* Light red with transparency */
+  --priority-2-title-bg: rgba(245, 158, 11, 0.1); /* Light yellow with transparency */
+  --priority-3-title-bg: rgba(59, 130, 246, 0.1); /* Light blue/gray with transparency */
+
+  /* Other */
   --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); /* Very light shadow */
   --border-radius: 5px;
   --transition-speed: 0.3s;
 }
 
-/* ========== DARK THEME ========== */
+/* Dark theme */
 .dark-theme {
-  /* --- Backgrounds --- */
+  /* Backgrounds */
   --bg-color: #121212;        /* Very dark background */
   --container-bg: #1e1e1e;    /* Background for containers */
   --card-bg: #2d2d2d;         /* Background for cards/forms */
   --input-bg: #2d2d2d;        /* Background for input fields */
-  --priority-1-bg: #2c0000;   /* Very dark red */
-  --priority-2-bg: #332200;   /* Very dark yellow */
-  --priority-3-bg: #1e1e1e;   /* Same as main container background */
+  --priority-1-title-bg: rgba(255, 82, 82, 0.15); /* Dark red with transparency */
+  --priority-2-title-bg: rgba(255, 215, 64, 0.15); /* Dark yellow with transparency */
+  --priority-3-title-bg: rgba(158, 158, 158, 0.15); /* Dark gray with transparency */
+  --priority-1-border: #ff5252;
+  --priority-2-border: #ffd740;
+  --priority-3-border: #9e9e9e;
 
-  /* --- Text Colors --- */
+  /* Text Colors */
   --text-color: #e0e0e0;      /* Light gray text */
   --text-light: #b0b0b0;      /* Lighter gray for secondary text */
   --text-inverted: #000000;   /* Black text on colored buttons */
 
-  /* --- Borders --- */
+  /* Borders */
   --border-color: #333333;
   --border-card: #444444;
 
-  /* --- Primary Colors (warm/saturated for contrast on dark) --- */
+  /* Primary Colors: Warm/saturated for contrast on dark */
   --primary-color: #bb86fc;       /* Purple (Material Dark) */
   --primary-hover: #d0bcff;
   --secondary-color: #9e9e9e;     /* Light gray */
@@ -85,7 +89,7 @@
   --danger-color: #cf6679;        /* Pinkish-red (Material Dark Error) */
   --info-color: #03dac6;          /* Teal */
 
-  /* --- Button Colors --- */
+  /* Button Colors */
   --btn-primary-bg: var(--primary-color);
   --btn-primary-hover: var(--primary-hover);
   --btn-primary-text: var(--text-inverted);
@@ -96,19 +100,11 @@
   --btn-secondary-hover: #bdbdbd; /* Lighter shade */
   --btn-secondary-text: var(--text-inverted);
 
-  /* --- Priority Borders --- */
-  --priority-1-border: #ff5252; /* Red */
-  --priority-2-border: #ffd740; /* Yellow */
-  --priority-3-border: #9e9e9e; /* Gray */
-
-  /* --- Other --- */
+  /* Other */
   --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); /* More noticeable shadow on dark */
-  /* border-radius and transition-speed remain the same */
 }
 
 /* ========== BASE STYLES ========== */
-
-/* Apply transitions to everything that changes color */
 body,
 .container,
 .form-control,
@@ -143,8 +139,6 @@ body {
 }
 
 /* ========== HEADERS AND NAVIGATION ========== */
-
-/* Header and navigation in the header */
 .header {
   border-bottom: 1px solid var(--border-color);
   padding-bottom: 20px;
@@ -155,14 +149,13 @@ body {
   flex-wrap: wrap;
 }
 
-/* User information */
 .user-info {
-  font-size: 14px;
-  color: var(--text-light);
+  font-size: 16px;
+  color: var(--text-color);
   text-align: right;
+  font-weight: 500;
 }
 
-/* Welcome text */
 .welcome-text {
   font-size: 18px;
   color: var(--text-color);
@@ -170,8 +163,6 @@ body {
 }
 
 /* ========== FORMS ========== */
-
-/* General style for forms */
 .task-form {
   background-color: var(--card-bg);
   padding: 20px;
@@ -188,7 +179,6 @@ body {
   border-bottom: 1px solid var(--border-color);
 }
 
-/* Form field groups */
 .form-group {
   margin-bottom: 20px;
 }
@@ -200,7 +190,6 @@ body {
   color: var(--text-color);
 }
 
-/* Input fields, text areas, selects */
 .form-control {
   width: 100%;
   padding: 12px;
@@ -213,20 +202,17 @@ body {
   transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
 }
 
-/* Style for focus on input field */
 .form-control:focus {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 2px rgba(0, 124, 186, 0.2);
 }
-/* For dark theme, slightly change the focus shadow color */
+
 .dark-theme .form-control:focus {
   box-shadow: 0 0 0 3px rgba(187, 134, 252, 0.2);
 }
 
 /* ========== BUTTONS ========== */
-
-/* General button style */
 .btn {
   display: inline-block;
   padding: 12px 24px;
@@ -236,24 +222,19 @@ body {
   font-size: 16px;
   text-decoration: none;
   text-align: center;
+  background-color: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
   transition: background-color var(--transition-speed);
 }
 
-/* Primary button (e.g., Add Task) */
-.btn {
-  background-color: var(--btn-primary-bg);
-  color: var(--btn-primary-text);
-}
 .btn:hover {
   background-color: var(--btn-primary-hover);
 }
 
-/* Danger button (Logout) */
-a.logout-btn, /* Specific style for logout link */
+a.logout-btn,
 .btn.logout-btn {
   background-color: var(--btn-danger-bg);
   color: var(--btn-danger-text);
-  /* Ensure link-specific styles are overridden */
   display: inline-block;
   padding: 12px 24px;
   border: none;
@@ -264,29 +245,26 @@ a.logout-btn, /* Specific style for logout link */
   text-align: center;
   transition: background-color var(--transition-speed);
 }
+
 a.logout-btn:hover,
 .btn.logout-btn:hover {
   background-color: var(--btn-danger-hover);
 }
 
-/* Full-width button */
 .btn-block {
   display: block;
   width: 100%;
 }
 
 /* ========== SECTION NAVIGATION ========== */
-
-/* Navigation menu */
 .section-nav {
   display: flex;
-  gap: 15px; /* Increased spacing */
+  gap: 15px;
   margin-bottom: 20px;
   padding-bottom: 15px;
   border-bottom: 1px solid var(--border-color);
 }
 
-/* Navigation buttons */
 .nav-btn {
   background-color: var(--card-bg);
   color: var(--text-color);
@@ -308,8 +286,6 @@ a.logout-btn:hover,
 }
 
 /* ========== SECTIONS ========== */
-
-/* General style for sections */
 .section {
   display: none;
 }
@@ -325,11 +301,7 @@ a.logout-btn:hover,
 }
 
 /* ========== TASKS ========== */
-
-/* Container for the task list with scrolling */
 #tasksContainer {
-  /* max-height: 600px; */
-  /* overflow-y: auto; */
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   padding: 10px;
@@ -337,63 +309,72 @@ a.logout-btn:hover,
   margin-bottom: 20px;
 }
 
-/* Style for individual task */
 .task-item {
-  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--priority-1-border);
   padding: 15px;
   margin: 10px 0;
   border-radius: var(--border-radius);
   background: var(--container-bg);
 }
 
-/* Left borders by priority */
 .task-item.priority-1 {
-  border-left: 4px solid var(--priority-1-border);
-  /* background-color: var(--priority-1-bg); */
+    border-left-color: var(--priority-1-border);
 }
 .task-item.priority-2 {
-  border-left: 4px solid var(--priority-2-border);
-  /* background-color: var(--priority-2-bg); */
+    border-left-color: var(--priority-2-border);
 }
 .task-item.priority-3 {
-  border-left: 4px solid var(--priority-3-border);
-  /* background-color: var(--priority-3-bg); */
+    border-left-color: var(--priority-3-border);
 }
 
-/* Headers and text inside tasks */
+.task-item.priority-1 h4 {
+    background: var(--priority-1-title-bg);
+}
+.task-item.priority-2 h4 {
+    background: var(--priority-2-title-bg);
+}
+.task-item.priority-3 h4 {
+    background: var(--priority-3-title-bg);
+}
+
 .task-item h4 {
-  /* --- NEW: Prevent horizontal overflow in titles --- */
   overflow-wrap: break-word;
   word-break: break-word;
   color: var(--text-color);
   margin-top: 0;
-  /* Prevent horizontal scrollbar on the description itself */
-    overflow-x: hidden; 
+  margin-bottom: 10px;
+  padding: 5px 10px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow-x: hidden;
 }
+
 .task-item p {
   color: var(--text-color);
   margin: 10px 0;
+  padding-left: 10px;
+  border-left: 1px dashed var(--border-color);
 }
 
-/* Row with priority, deadline and button fields */
 .form-row {
   display: flex;
-  gap: 15px; /* Increased spacing */
+  gap: 15px;
   margin-bottom: 10px;
   align-items: end;
 }
 
 .form-row .form-group {
   flex: 1;
-  margin-bottom: 0; /* Remove bottom margin for groups inside the row */
+  margin-bottom: 0;
 }
 
 .form-row .align-end {
   align-self: flex-end;
-  flex: 0 0 auto; /* Button does not stretch */
+  flex: 0 0 auto;
 }
 
-/* Styles for the "Add Task" button in the form */
 .task-form .btn {
   width: 100%;
   padding: 14px;
@@ -402,27 +383,35 @@ a.logout-btn:hover,
   margin-top: 5px;
 }
 
-/* Styles for the priority select */
 #taskPriority {
   background-color: var(--input-bg);
   color: var(--text-color);
-  appearance: none; /* Remove default browser style for consistency */
-  padding-right: 30px; /* Space for arrow if added */
+  appearance: none;
+  padding-right: 30px;
 }
 
-/* Styles for datetime-local */
 #taskDeadline {
   background-color: var(--input-bg);
   color: var(--text-color);
   width: 100%;
 }
+
 #taskDeadline::-webkit-calendar-picker-indicator {
-  /* Calendar icon is usually visible in light theme, no filter needed */
   cursor: pointer;
 }
-/* For dark theme, invert the calendar icon */
+
 .dark-theme #taskDeadline::-webkit-calendar-picker-indicator {
-  filter: invert(1); /* Invert the color of the calendar icon */
+  filter: invert(1);
+}
+
+.task-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8em;
+  color: var(--text-light);
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color);
 }
 
 /* ========== LOGIN PAGE ========== */
@@ -438,15 +427,12 @@ a.logout-btn:hover,
 
 /* ========== FOOTER ========== */
 footer {
-  /* Remove old flex styles for simplicity of vertical centering */
-  text-align: center; /* Center content inside footer by default */
+  text-align: center;
   margin-top: 20px;
-  padding: 15px 10px; /* Increase top/bottom padding */
+  padding: 15px 10px;
   border-top: 1px solid var(--border-color);
   color: var(--text-light);
-  /* background-color: var(--container-bg); */ /* Optionally, if a background is needed */
 }
-/* ========== END OF FOOTER ========== */
 
 /* ========== UTILITIES ========== */
 .text-center {
@@ -485,113 +471,78 @@ footer {
   }
 }
 
-/* ========== DARK THEME SPECIFIC ENHANCEMENTS ========== */
-/* Refined styles for the task form in dark theme for better readability */
-
+/* ========== DARK THEME ENHANCEMENTS ========== */
 .dark-theme .task-form {
-  background-color: #252525; /* Slightly darker than general card-bg */
-  border: 1px solid #3a3a3a; /* More distinct border */
+  background-color: #252525;
+  border: 1px solid #3a3a3a;
 }
 
 .dark-theme .task-form h3 {
-  color: #f0f0f0; /* Lighter header */
+  color: #f0f0f0;
   border-bottom: 1px solid #3a3a3a;
 }
 
 .dark-theme .form-group label {
-  color: #d0d0d0; /* Label color slightly lighter than main text */
+  color: #d0d0d0;
 }
 
-/* Custom arrow for select in dark theme */
 .dark-theme #taskPriority {
   background-color: #2d2d2d;
   color: #e0e0e0;
-  /* White arrow suitable for dark background */
   background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23e0e0e0'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
   background-repeat: no-repeat;
   background-position: right 10px center;
   background-size: 16px;
 }
 
-/* User information */
-.user-info {
-  font-size: 16px; /* Increase font size from 14px */
-  color: var(--text-color); /* Make text color more contrast */
-  text-align: right;
-  font-weight: 500; /* Make text slightly bolder for better readability */
-}
-/* ========== END OF DARK THEME SPECIFIC ENHANCEMENTS ========== */
-
-/* Styles for the task completion checkbox */
+/* ========== TASK COMPLETION ========== */
 .task-complete-checkbox {
-    margin-right: 10px; /* Spacing to the right of the checkbox */
-    transform: scale(1.2); /* Slightly enlarge for better visibility */
-    cursor: pointer;
+  transform: scale(1.2);
+  accent-color: var(--primary-color);
+  cursor: pointer;
 }
 
-/* Styles for a "completed" task */
 .task-item.completed {
-    opacity: 0.7; /* Make semi-transparent */
-    text-decoration: line-through; /* Strikethrough the title */
-    color: var(--text-light); /* Lighter text color */
+  opacity: 0.7;
+  text-decoration: line-through;
+  color: var(--text-light);
 }
 
-/* Styles for the inline loading spinner within a task */
 .task-loading-spinner {
-    display: none; /* Hidden by default */
-    font-size: 0.8em;
-    color: var(--text-light);
-    margin-top: 5px;
+  display: none;
+  font-size: 0.8em;
+  color: var(--text-light);
+  margin-left: 10px;
 }
 
-/* Styles for the task item while it's being updated */
 .task-item.task-updating {
-    /* Visual cue that interaction is disabled */
-    pointer-events: none;
-    opacity: 0.7;
+  pointer-events: none;
+  opacity: 0.7;
 }
 
-/* ========== TASK FINALIZATION ANIMATION ========== */
-/* Style for the animation to slide a completed task out to the left */
+/* Animation to slide a completed task out to the left */
 @keyframes taskSlideOutLeft {
-    0% {
-        opacity: 1;
-        transform: translateX(0); /* Start at original position */
-    }
-    100% {
-        opacity: 0;
-        transform: translateX(-100vw); /* Move fully off-screen to the left */
-        /* transform: translateX(calc(-100% - 20px)); */ /* Alternative: Move relative to its own width */
-    }
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-100vw);
+  }
 }
 
-/* Class applied to trigger the slide-out animation */
 .task-finalize-animation {
-    /* Apply the animation */
-    animation: taskSlideOutLeft 0.6s ease-in-out forwards;
-    /* forwards means the element will stay in the state of the last frame of the animation */
+  animation: taskSlideOutLeft 0.6s ease-in-out forwards;
 }
 
-/* Preserve formatting (spaces, line breaks) in task descriptions */
+/* Preserve formatting in task descriptions */
 .task-description {
-    /* white-space: pre-line; - preserves line breaks (\n -> <br>), 
-       but collapses multiple spaces into one. 
-       Good for normal text with paragraphs. */
-    /* white-space: pre-wrap; - preserves line breaks (\n -> <br>) 
-       and multiple spaces, but allows wrapping of long words. 
-       Better preserves original formatting, including indentation with spaces. */
-    white-space: pre-wrap; 
-    /* Allow long words/strings to break and wrap onto the next line */
-    overflow-wrap: break-word; 
-    /* Alternative (more aggressive): Break words at any character if necessary */
-    word-break: break-word; /* или break-all для еще более агрессивного переноса */
-    /* Prevent horizontal scrollbar on the description itself */
-    overflow-x: hidden; 
-
-    /* Optionally: add padding/margin for better visual separation */
-    margin: 10px 0;
-    border-radius: 4px;
-    /* border-left: 2px solid #ccc; */ /* Thin left border as a visual separator */
-    /* overflow-x: auto; /* Add horizontal scrolling if a line is too long */
-    max-width: 100%; /* Constrain width */
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  overflow-x: hidden;
+  margin: 10px 0;
+  border-radius: 4px;
+  max-width: 100%;
 }
