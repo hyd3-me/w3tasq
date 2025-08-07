@@ -445,6 +445,42 @@ footer {
   color: var(--text-light);
 }
 
+/* Marquee for user messages */
+.marquee-container {
+  width: 100%;
+  overflow: hidden;
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  padding: 10px 0 10px 0;
+  margin-bottom: 20px;
+  box-shadow: var(--box-shadow);
+  position: relative;
+}
+
+.marquee-text {
+  position: absolute;
+  white-space: nowrap;
+  color: var(--text-color);
+  font-size: 16px;
+  animation: marquee 18s linear infinite;
+  right: 0; /* Start from the right edge of the container */
+}
+
+.marquee-dummy {
+  visibility: hidden;
+  white-space: nowrap;
+  font-size: 16px; /* Match marquee-text */
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100vw); /* Move fully off-screen to the left */
+  }
+}
+
 /* ========== RESPONSIVENESS ========== */
 @media (max-width: 768px) {
   .container {

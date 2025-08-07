@@ -117,12 +117,12 @@ if (logoutButton) {
                 if (data.success) {
                     window.location.href = '/login';
                 } else {
-                    alert('Logout failed: ' + data.message);
+                    updateMarquee('Logout failed: ' + data.message);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Network error occurred during logout');
+                updateMarquee('Network error occurred during logout');
             });
     });
 }
@@ -139,7 +139,7 @@ if (taskForm) {
         const deadline = document.getElementById('taskDeadline').value;
 
         if (!title) {
-            alert('Please enter a task title');
+            updateMarquee('Please enter a task title');
             return;
         }
 
@@ -169,7 +169,7 @@ if (taskForm) {
             })
             .then(data => {
                 if (data.success) {
-                    alert('Task created successfully!');
+                    updateMarquee(`Task ${data.task.id} created successfully!`);
                     document.getElementById('taskTitle').value = '';
                     document.getElementById('taskDescription').value = '';
                     document.getElementById('taskDeadline').value = '';
@@ -178,15 +178,15 @@ if (taskForm) {
                     // After creating a task, you can automatically switch to the list
                     // switchSection('tasksSection');
                 } else {
-                    alert('Error creating task: ' + (data.error || 'Unknown error'));
+                    updateMarquee('Error creating task: ' + (data.error || 'Unknown error'));
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
                 if (error.error) {
-                    alert('Error creating task: ' + error.error);
+                    updateMarquee('Error creating task: ' + error.error);
                 } else {
-                    alert('Network error occurred. Please try again.');
+                    updateMarquee('Network error occurred. Please try again.');
                 }
             });
     });
@@ -460,6 +460,15 @@ document.addEventListener('DOMContentLoaded', function () {
     window.addEventListener('scroll', checkWindowScroll);
 });
 
+// Function to update marquee with a new message
+    function updateMarquee(message) {
+        const marqueeText = document.querySelector('.marquee-text');
+        marqueeText.textContent = message; // Update animated text
+        marqueeText.style.animation = 'none'; // Reset animation
+        marqueeText.offsetHeight; // Trigger reflow to restart animation
+        marqueeText.style.animation = 'marquee 18s linear infinite'; // Restart animation
+    }
+
 // --- Function to handle the change event on a task completion checkbox ---
 function handleTaskCheckboxChange(event) {
     /**
@@ -524,6 +533,7 @@ function handleTaskCheckboxChange(event) {
             }
         // --- Success Path ---
         console.log(`Task ${taskId} status updated to ${statusToSend} on server.`);
+        updateMarquee(`Task ${taskId} status updated to ${statusToSend} on server.`);
 
         // Update the visual state of the task item based on the new status
         if (statusToSend === 1) {
@@ -563,7 +573,7 @@ function handleTaskCheckboxChange(event) {
         checkbox.disabled = false;
 
         // 3. Inform the user about the error
-        alert('Error updating task status: ' + (error.message || 'Unknown error'));
+        updateMarquee('Error updating task status: ' + (error.message || 'Unknown error'));
 
     });
     // Note: There is no 'finally' block here to re-enable the checkbox,
