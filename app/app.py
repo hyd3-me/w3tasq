@@ -1,10 +1,11 @@
 # app/app.py
+import logging
+from logging.handlers import RotatingFileHandler
 from flask import Flask, render_template, session, redirect, url_for, request, jsonify
 from app import utils, db_utils
-from app.models import db # pyright: ignore[reportMissingImports]
-from app.config import config_map # pyright: ignore[reportMissingImports]
-# Import filters
-from app.template_filters import shorten_wallet_address # pyright: ignore[reportMissingImports]
+from app.models import db
+from app.config import config_map
+from app.template_filters import shorten_wallet_address
 
 
 def create_app(config_name='default'):
@@ -13,6 +14,40 @@ def create_app(config_name='default'):
     
     # Load configuration
     app.config.from_object(config_map[config_name])
+
+    # Configure logger
+    root_logger = logging.getLogger('w3tasq')
+    root_logger.setLevel(app.config['LOG_LEVEL'])
+    
+    # Remove existing handlers to avoid duplicates
+    root_logger.handlers.clear()
+    
+    # Create formatter
+    formatter = logging.Formatter(
+        app.config['LOG_FORMAT'],
+        datefmt=app.config.get('LOG_DATEFMT')
+    )
+    
+    # Add console handler for development
+    if not app.config.get('LOG_TO_FILE', False):
+        console_handler = logging.StreamHandler()
+        console_handler.setFormatter(formatter)
+        root_logger.addHandler(console_handler)
+    else:
+        # Ensure logs directory exists
+        if not utils.is_log_dir():
+            utils.make_log_dir()
+        # Add file handler with rotation for testing/production
+        file_handler = RotatingFileHandler(
+            app.config['LOG_FILE'],
+            maxBytes=app.config.get('LOG_MAX_BYTES', 1 * 1024 * 1024),
+            backupCount=app.config.get('LOG_BACKUP_COUNT', 3)
+        )
+        file_handler.setFormatter(formatter)
+        root_logger.addHandler(file_handler)
+    
+    # Log application start
+    root_logger.info(f"Starting w3tasq in {config_name} mode")
 
     # Register custom filters
     app.jinja_env.filters['shorten_wallet'] = shorten_wallet_address
@@ -29,48 +64,58 @@ def create_app(config_name='default'):
     
     @app.route('/')
     def index():
+        root_logger.debug("Processing index route")
         # Check if user is authenticated
         if 'user_address' in session and session.get('authenticated'):
             return render_template('index.html', user_address=session.get('user_address'))
         else:
+            root_logger.info("Redirecting unauthenticated user to login")
             # Real HTTP redirect to login page
             return redirect(url_for('login'))
     
     @app.route('/login')
     def login():
+        root_logger.debug("Rendering login page")
         return render_template('login.html')
     
     @app.route('/api/auth/logout', methods=['POST'])
     def logout():
+        root_logger.info(f"User {shorten_wallet_address(session.get('user_address', 'unknown'))} logged out")
         """Clear authentication session"""
         session.clear()
         return jsonify({'success': True, 'message': 'Logged out successfully'})
     
     @app.route('/api/auth/challenge', methods=['POST'])
     def get_challenge():
+        root_logger.debug("Processing challenge request")
         """Generate a challenge message for the given address"""
         try:
             data = request.get_json()
             address = data.get('address')
             
             if not address:
+                root_logger.error("Address is required for challenge")
                 return jsonify({'error': 'Address is required'}), 400
             
             # Generate challenge message using existing utils function
             message = utils.generate_challenge_message(address)
             
+            root_logger.info(f"Generated challenge for address {shorten_wallet_address(address)}")
             return jsonify({
                 'success': True,
                 'message': message
             })
             
         except ValueError as e:
+            root_logger.error(f"ValueError in challenge request: {str(e)}")
             return jsonify({'error': str(e)}), 400
         except Exception as e:
+            root_logger.error(f"Unexpected error in challenge request: {str(e)}")
             return jsonify({'error': 'Internal server error'}), 500
     
     @app.route('/api/auth/verify', methods=['POST'])
     def verify_signature():
+        root_logger.debug("Processing signature verification")
         """Verify the signature provided by the client"""
         try:
             data = request.get_json()
@@ -78,14 +123,18 @@ def create_app(config_name='default'):
             signature = data.get('signature')
             
             if not address or not signature:
+                root_logger.error("Address and signature are required for verification")
                 return jsonify({'error': 'Address and signature are required'}), 400
             
             # Verify signature using existing utils function
             is_valid, message = utils.verify_signature(address, signature)
             
             if not is_valid:
+                root_logger.warning(f"Signature verification failed for address {shorten_wallet_address(address)}: {message}")
                 return jsonify({'error': message}), 401
             user_db, was_created = db_utils.get_or_create_user(address)
+
+            root_logger.info(f"Signature verified for address {shorten_wallet_address(address)}, user {'created' if was_created else 'exists'}")
 
             # Store user in session
             session['user_address'] = address
@@ -99,14 +148,17 @@ def create_app(config_name='default'):
             })
                 
         except Exception as e:
+            root_logger.error(f"Unexpected error in signature verification: {str(e)}")
             return jsonify({'error': 'Internal server error'}), 500
     
     @app.route('/api/tasks', methods=['POST'])
     def create_task():
         """Create a new task for authenticated user"""
+        root_logger.debug("Processing task creation")
         try:
             # Check authentication
             if not session.get('authenticated') or not session.get('user_id'):
+                root_logger.warning("Unauthorized task creation attempt")
                 return jsonify({'error': 'Authentication required'}), 401
             
             user_id = session['user_id']
@@ -114,6 +166,7 @@ def create_app(config_name='default'):
             
             # Validate required fields
             if not data or not data.get('title'):
+                root_logger.error("Title is required for task creation")
                 return jsonify({'error': 'Title is required'}), 400
             
             # Create task
@@ -124,12 +177,14 @@ def create_app(config_name='default'):
                 priority=data.get('priority', 3),  # Default LOW
                 status=data.get('status', 0)       # Default ACTIVE
             )
+            root_logger.info(f"Task '{data['title']}' added by user {shorten_wallet_address(session.get('user_address', 'unknown'))}")
             return jsonify({
                 'success': True,
                 'task': task.to_dict()
             }), 201
 
         except Exception as e:
+            root_logger.error(f"Unexpected error in task creation: {str(e)}")
             db.session.rollback()
             return jsonify({'error': 'Internal server error'}), 500
     
@@ -137,9 +192,11 @@ def create_app(config_name='default'):
     def get_user_tasks():
 
         """Get tasks for the authenticated user with cursor-based pagination."""
+        root_logger.debug("Processing task retrieval")
         try:
             # Check authentication
             if not session.get('authenticated') or not session.get('user_id'):
+                root_logger.warning("Unauthorized task retrieval attempt")
                 return jsonify({'error': 'Authentication required'}), 401
             
             user_id = session['user_id']
@@ -158,6 +215,7 @@ def create_app(config_name='default'):
                     cursor_id = int(cursor_str)
                     
             except (ValueError, TypeError):
+                root_logger.debug("Invalid cursor, resetting to None")
                 cursor_id = None
                 limit = app.config.get('TASKS_PER_PAGE', 12)
             
@@ -165,6 +223,8 @@ def create_app(config_name='default'):
             tasks, next_cursor_id, has_more = db_utils.get_user_tasks_cursor(
                 user_id, cursor_id, limit
             )
+
+            root_logger.info(f"Retrieved {len(tasks)} tasks for user {shorten_wallet_address(session.get('user_address', 'unknown'))}")
             
             # Prepare data for response
             tasks_data = [task.to_dict() for task in tasks]
@@ -181,7 +241,7 @@ def create_app(config_name='default'):
             })
             
         except Exception as e:
-            print(f"Error retrieving tasks: {e}") # For debugging
+            root_logger.error(f"Unexpected error in task retrieval: {str(e)}")
             return jsonify({'error': 'Internal server error'}), 500
     
     @app.route('/api/tasks/<int:task_id>', methods=['PATCH'])
@@ -191,9 +251,11 @@ def create_app(config_name='default'):
         PATCH /api/tasks/<task_id>
         Expects JSON: {"status": 0|1|2}
         """
+        root_logger.debug(f"Processing status update for task {task_id}")
         try:
             # 1. Check authentication
             if not session.get('authenticated') or not session.get('user_id'):
+                root_logger.warning("Unauthorized task status update attempt")
                 return jsonify({'error': 'Authentication required'}), 401
 
             user_id = session['user_id']
@@ -201,9 +263,11 @@ def create_app(config_name='default'):
 
             # 2. Validate incoming data presence and structure
             if not data:
+                root_logger.error("Request body must be valid JSON")
                 return jsonify({'error': 'Request body must be valid JSON'}), 400
 
             if 'status' not in data:
+                root_logger.error("Missing required field: status")
                 return jsonify({'error': 'Missing required field: status'}), 400
 
             new_status = data['status']
@@ -218,6 +282,7 @@ def create_app(config_name='default'):
             if authorized_result is False:
                 # User is not authorized (task not found or belongs to another user)
                 # Returning 404 aligns with common REST practices for this scenario.
+                root_logger.warning(f"Unauthorized task update attempt: {auth_message}")
                 return jsonify({'error': auth_message}), 404
 
             # If authorized_result is not False, it's the Task instance
@@ -230,9 +295,11 @@ def create_app(config_name='default'):
             if not success:
                 # 5a. Return error response if update failed (validation or DB error)
                 # The utility function should have handled session rollback on error
+                root_logger.error(f"Task status update failed: {update_message}")
                 return jsonify({'error': update_message}), 400 # Use 400 for client errors like validation
             # 5a. Return success response with updated task data
             # The task_instance should be updated by update_task_status_internal
+            root_logger.info(f"Task {task_id} status updated to {new_status} by user {shorten_wallet_address(session.get('user_address', 'unknown'))}")                        
             return jsonify({
                 'success': True,
                 'message': update_message, # Message from the utility function
@@ -243,6 +310,7 @@ def create_app(config_name='default'):
             # 6. Handle unexpected errors
             # Log the error for debugging in production (consider using app.logger)
             # print(f"Unexpected error in update_task_status: {e}") # For debugging
+            root_logger.error(f"Unexpected error in task status update: {str(e)}")
             db.session.rollback() # Ensure session is clean on unexpected error
             return jsonify({'error': 'Internal server error'}), 500
     
