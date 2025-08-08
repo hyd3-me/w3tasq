@@ -4,6 +4,8 @@ from datetime import datetime, timedelta
 from web3 import Web3
 from eth_account.messages import encode_defunct
 import os, sys
+import redis
+import json
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
@@ -12,8 +14,19 @@ import private_data
 # Set up logger
 logger = logging.getLogger('w3tasq.utils')
 
-# Temporary storage for challenges (use Redis in production)
-CHALLENGES = {}
+# Initialize Redis client
+redis_client = None
+
+def init_redis(app):
+    """Initialize Redis client with app configuration"""
+    global redis_client
+    redis_client = redis.Redis(
+        host=app.config['REDIS_HOST'],
+        port=app.config['REDIS_PORT'],
+        password=app.config['REDIS_PASSWORD'],
+        decode_responses=True  # Automatically decode strings
+    )
+    logger.debug("Redis client initialized")
 
 def get_redis_pwd():
     return private_data.REDIS_PWD
@@ -39,12 +52,14 @@ def generate_challenge_message(address):
     # Create message for signing
     message = f"Sign this message to authenticate: {challenge} at {timestamp}"
     
-    # Store challenge with expiration (5 minutes)
-    CHALLENGES[normalized_address] = {
+    # Store challenge in Redis with 5-minute TTL
+    redis_key = f"w3tasq_challenge:{normalized_address}"
+    redis_client.hset(redis_key, mapping={
         'challenge': challenge,
         'message': message,
-        'expires_at': datetime.utcnow() + timedelta(minutes=5)
-    }
+        'expires_at': timestamp
+    })
+    redis_client.expire(redis_key, 300)  # 5 minutes TTL
     logger.info(f"Challenge generated for address {normalized_address}")
     return message
 
@@ -60,19 +75,19 @@ def verify_signature(address, signature):
         # Normalize address
         normalized_address = Web3.to_checksum_address(address)
         
-        # Check if challenge exists for this address
-        if normalized_address not in CHALLENGES:
+        # Check if challenge exists in Redis
+        redis_key = f"w3tasq_challenge:{normalized_address}"
+        stored_challenge = redis_client.hgetall(redis_key)
+        
+        if not stored_challenge:
             logger.warning(f"No challenge found for address {normalized_address}")
             return False, "No challenge found for this address"
         
-        # Get stored challenge
-        stored_challenge = CHALLENGES[normalized_address]
-        
         # Check if challenge has expired
-        if datetime.utcnow() > stored_challenge['expires_at']:
-            # Remove expired challenge
+        expires_at = datetime.fromisoformat(stored_challenge['expires_at'])
+        if datetime.utcnow() > expires_at + timedelta(minutes=5):
             logger.warning(f"Challenge expired for address {normalized_address}")
-            del CHALLENGES[normalized_address]
+            redis_client.delete(redis_key)
             return False, "Challenge has expired"
         
         # Create Web3 instance
@@ -93,7 +108,7 @@ def verify_signature(address, signature):
         # If valid, remove used challenge
         if is_valid:
             logger.info(f"Signature verified for address {normalized_address}")
-            del CHALLENGES[normalized_address]
+            redis_client.delete(redis_key)
         else:
             logger.warning(f"Signature does not match address {normalized_address}")
         
