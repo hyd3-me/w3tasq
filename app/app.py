@@ -46,6 +46,9 @@ def create_app(config_name='default'):
         file_handler.setFormatter(formatter)
         root_logger.addHandler(file_handler)
     
+    # Initialize Redis
+    utils.init_redis(app)
+    
     # Log application start
     root_logger.info(f"Starting w3tasq in {config_name} mode")
     #app_logger.debug(f"db_path: {app.config.get('SQLALCHEMY_DATABASE_URI')}")
