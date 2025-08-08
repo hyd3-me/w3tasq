@@ -9,10 +9,12 @@
         <h1>w3tasq</h1>
     </div>
     <div class="user-info">
-        <!-- Use custom filter to shorten wallet address -->
-        <div>{{ user_address | shorten_wallet }}</div>
-        <div style="margin-top: 10px;">
-            <a href="#" id="logoutBtn" class="btn logout-btn">Logout</a>
+        <!-- Button displaying shortened wallet address with dropdown menu -->
+        <button class="user-profile-btn" data-toggle="dropdown">
+            {{ user_address | shorten_wallet }}
+        </button>
+        <div class="dropdown-menu">
+            <a href="#" id="logoutBtn" class="dropdown-item">Logout</a>
         </div>
     </div>
 </div>

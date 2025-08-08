@@ -154,12 +154,38 @@ body {
   color: var(--text-color);
   text-align: right;
   font-weight: 500;
+  position: relative; /* For dropdown positioning */
 }
 
-.welcome-text {
-  font-size: 18px;
+/* Dropdown menu */
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  width: 100%;
+  z-index: 1000;
+}
+
+.user-info:hover [data-toggle="dropdown"] + .dropdown-menu {
+  display: block;
+}
+
+.dropdown-item {
+  display: block;
+  box-sizing: border-box;
+  padding: 10px 15px;
   color: var(--text-color);
-  margin: 10px 0;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+.dropdown-item:hover {
+  background-color: var(--border-color);
 }
 
 /* ========== FORMS ========== */
@@ -231,8 +257,8 @@ body {
   background-color: var(--btn-primary-hover);
 }
 
-a.logout-btn,
-.btn.logout-btn {
+.user-profile-btn {
+  min-width: 120px;
   background-color: var(--btn-danger-bg);
   color: var(--btn-danger-text);
   display: inline-block;
@@ -246,8 +272,7 @@ a.logout-btn,
   transition: background-color var(--transition-speed);
 }
 
-a.logout-btn:hover,
-.btn.logout-btn:hover {
+.user-profile-btn:hover {
   background-color: var(--btn-danger-hover);
 }
 
@@ -490,7 +515,6 @@ footer {
   }
 
   .header {
-    flex-direction: column;
     text-align: center;
   }
 
