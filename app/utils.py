@@ -15,6 +15,9 @@ logger = logging.getLogger('w3tasq.utils')
 # Temporary storage for challenges (use Redis in production)
 CHALLENGES = {}
 
+def get_redis_pwd():
+    return private_data.REDIS_PWD
+
 def generate_challenge_message(address):
     """
     Generate a unique challenge message for the given address
