@@ -43,6 +43,7 @@ pydantic-core==2.33.2
 pygments==2.19.2
 pytest==8.4.1
 pyunormalize==16.0.0
+redis==6.4.0
 regex==2024.11.6
 requests==2.32.4
 rlp==4.1.0
