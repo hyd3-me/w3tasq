@@ -168,7 +168,7 @@ if (taskForm) {
             })
             .then(data => {
                 if (data.success) {
-                    updateMarquee(`Task ${data.task.id} created successfully!`);
+                    updateMarquee(`${data.task.title} created successfully!`);
                     document.getElementById('taskTitle').value = '';
                     document.getElementById('taskDescription').value = '';
                     document.getElementById('taskDeadline').value = '';
@@ -532,7 +532,7 @@ function handleTaskCheckboxChange(event) {
             }
         // --- Success Path ---
         console.log(`Task ${taskId} status updated to ${statusToSend} on server.`);
-        updateMarquee(`Task ${taskId} status updated to ${statusToSend} on server.`);
+        updateMarquee(`${data.task.title} status updated`);
 
         // Update the visual state of the task item based on the new status
         if (statusToSend === 1) {
