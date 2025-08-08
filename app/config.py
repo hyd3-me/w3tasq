@@ -56,7 +56,7 @@ class ProductionConfig(Config):
     LOG_TO_FILE = True
     LOG_FILE = utils.join_path(utils.get_source_dir(), 'logs', 'w3tasq.log')
     LOG_MAX_BYTES = 1 * 1024 * 1024  # 1 MB per log file
-    LOG_BACKUP_COUNT = 3  # Keep 5 backup files
+    LOG_BACKUP_COUNT = 3  # Keep 3 backup files
 
 config_map = {
     'development': DevelopmentConfig,

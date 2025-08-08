@@ -355,7 +355,6 @@ a.logout-btn:hover,
   color: var(--text-color);
   margin: 10px 0;
   padding-left: 10px;
-  border-left: 1px dashed var(--border-color);
 }
 
 .form-row {
@@ -406,12 +405,14 @@ a.logout-btn:hover,
 
 .task-meta {
   display: flex;
-  justify-content: space-between;
   font-size: 0.8em;
   color: var(--text-light);
   margin-top: 10px;
   padding-top: 10px;
-  border-top: 1px solid var(--border-color);
+}
+
+.task-meta span {
+    margin-left: auto; /* Push span to the right */
 }
 
 /* ========== LOGIN PAGE ========== */

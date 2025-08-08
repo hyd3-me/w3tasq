@@ -54,8 +54,7 @@ function formatTaskHtml(task) {
             </h4>
             ${task.description ? `<p>${escapeHtml(task.description)}</p>` : ''}
             <div class="task-meta">
-                <span>Priority: ${priorityText}</span>
-                <span>Created: ${createdAtStr}</span>
+                <span>${createdAtStr}</span>
             </div>
             ${task.deadline ? `<div style="font-size: 0.8em; color: #888; margin-top: 5px;">Deadline: ${new Date(task.deadline).toLocaleString()}</div>` : ''}
             <!-- Loading indicator for task update -->
