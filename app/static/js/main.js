@@ -51,6 +51,7 @@ function formatTaskHtml(task) {
             <h4>
             <input type="checkbox" id="task-complete-checkbox-${task.id}" class="task-complete-checkbox" data-task-id="${task.id}"${checkboxCheckedAttr}>
             ${escapeHtml(task.title)}
+            <button class="task-archive-btn" data-task-id="${task.id}" title="Archive task">✕</button>
             </h4>
             ${task.description ? `<p>${escapeHtml(task.description)}</p>` : ''}
             <div class="task-meta">
@@ -168,7 +169,7 @@ if (taskForm) {
             })
             .then(data => {
                 if (data.success) {
-                    updateMarquee(`${data.task.title} created successfully!`);
+                    updateMarquee(`"${data.task.title}" created successfully!`);
                     document.getElementById('taskTitle').value = '';
                     document.getElementById('taskDescription').value = '';
                     document.getElementById('taskDeadline').value = '';
@@ -231,6 +232,8 @@ function displayTasks(tasks) {
     // Attach event listeners to the newly rendered checkboxes
     attachTaskCheckboxListeners();
 
+    addArchiveButtonListeners();
+
 }
 
 // --- Function to append tasks to the end of the list ---
@@ -257,6 +260,8 @@ function appendTasks(tasks) {
 
     // Attach event listeners to the newly appended checkboxes
     attachTaskCheckboxListeners();
+
+    addArchiveButtonListeners();
 
     // If there are no more tasks, show a message
     if (!paginationState.has_more_tasks) {
@@ -598,6 +603,61 @@ function attachTaskCheckboxListeners() {
         }
     });
 }
+
+// Handle archive button click
+function handleTaskArchiveClick(event) {
+    const button = event.target;
+    const taskId = button.getAttribute('data-task-id');
+    const taskItem = button.closest('.task-item');
+    const spinner = taskItem.querySelector('.task-loading-spinner');
+
+    // Block interactions
+    button.disabled = true;
+    taskItem.classList.add('task-updating');
+    button.classList.add('task-updating');
+    if (spinner) spinner.style.display = 'block';
+
+    // Send request to update status
+    fetch(`/api/tasks/${taskId}`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: 2 }) // ARCHIVED
+    })
+    .then(response => {
+        if (spinner) spinner.style.display = 'none';
+        if (!response.ok) {
+            return response.json().then(err => Promise.reject(err));
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (!data.success) {
+            throw new Error(data.error || 'Unknown error from server');
+        }
+        updateMarquee(`${data.task.title} archived successfully`);
+        finalizeTaskCompletion(taskItem); // Reuse animation
+    })
+    .catch(error => {
+        console.error('Error archiving task:', error);
+        updateMarquee('Error archiving task: ' + (error.message || 'Unknown error'));
+        button.disabled = false;
+        taskItem.classList.remove('task-updating');
+        button.classList.remove('task-updating');
+    });
+}
+
+// Add listeners to all archive buttons
+function addArchiveButtonListeners() {
+    document.querySelectorAll('.task-archive-btn').forEach(button => {
+        if (!button.dataset.listenerAttached) {
+            button.addEventListener('click', handleTaskArchiveClick);
+            button.dataset.listenerAttached = 'true';
+        }
+    });
+}
+
 // --- NEW FUNCTION: Finalize the visual removal of a completed task ---
 /**
  * Applies a fade-out animation to a task item and removes it from the DOM after the animation completes.
