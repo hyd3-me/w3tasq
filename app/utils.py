@@ -31,6 +31,9 @@ def init_redis(app):
 def get_redis_pwd():
     return private_data.REDIS_PWD
 
+def get_env():
+    return os.getenv('FLASK_ENV', 'default')
+
 def generate_challenge_message(address):
     """
     Generate a unique challenge message for the given address

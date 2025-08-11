@@ -1,6 +1,6 @@
 from app import utils
 
-FLASK_ENV = 'development'
+FLASK_ENV = utils.get_env()
 
 class Config:
     """Base configuration class."""
