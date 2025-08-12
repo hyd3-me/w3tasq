@@ -1,0 +1,16 @@
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+.pytest_cache/
+env/
+venv/
+logs/
+*.log
+.git
+.gitignore
+tasks_notes.db
+private_data.py
+.env
+.env.prod

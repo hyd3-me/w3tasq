@@ -3,7 +3,7 @@ from logging.handlers import RotatingFileHandler
 from flask import Flask, render_template, session, redirect, url_for, request, jsonify
 from app import utils, db_utils
 from app.models import db
-from app.config import config_map
+from app.config import config_map, FLASK_ENV
 from app.template_filters import shorten_wallet_address
 
 app_logger = logging.getLogger('w3tasq.app')
@@ -319,7 +319,9 @@ def create_app(config_name='default'):
     
     return app
 
+app = create_app(config_name=FLASK_ENV)
+
 # For running in production
 if __name__ == '__main__':
-    app = create_app(config_name='testing')
+    app = create_app(config_name=FLASK_ENV)
     app.run(debug=True)

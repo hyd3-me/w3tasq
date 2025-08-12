@@ -1,0 +1,20 @@
+services:
+  web:
+    build: .
+    ports:
+      - "127.0.0.1:5000:5000"
+    volumes:
+      - ../tasks_notes.db:/source/db/tasks_notes.db
+      - ../private_data.py:/source/private_data.py
+    environment:
+      - FLASK_ENV=production
+      - REDIS_HOST=host.docker.internal
+      - REDIS_PORT=6379
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "2m"
+        max-file: "3"
+    restart: unless-stopped

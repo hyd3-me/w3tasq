@@ -12,8 +12,8 @@ class Config:
     LOG_FORMAT = '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
     LOG_DATEFMT = '%Y-%m-%d %H:%M:%S'
     # Redis settings
-    REDIS_HOST = 'localhost'
-    REDIS_PORT = 6379
+    REDIS_HOST = utils.get_redis_host()
+    REDIS_PORT = utils.get_redis_port()
     REDIS_PASSWORD = utils.get_redis_pwd()
 
     @staticmethod

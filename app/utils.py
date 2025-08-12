@@ -7,7 +7,10 @@ import os, sys
 import redis
 import json
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+def get_source_dir():
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+sys.path.append(os.path.dirname(get_source_dir()))
 
 import private_data
 
@@ -30,6 +33,12 @@ def init_redis(app):
 
 def get_redis_pwd():
     return private_data.REDIS_PWD
+
+def get_redis_host():
+    return os.getenv('REDIS_HOST', 'host.docker.internal')
+
+def get_redis_port():
+    return int(os.getenv('REDIS_PORT', 6379))
 
 def get_env():
     return os.getenv('FLASK_ENV', 'default')
@@ -167,12 +176,9 @@ def get_database_path():
     Returns path to tasks_notes.db file one level above project directory
     """
     logger.debug("Retrieving database path")
-    db_path = os.path.join(os.path.dirname(get_source_dir()), 'tasks_notes.db')
+    db_path = join_path(os.path.dirname(get_source_dir()), 'db', 'tasks_notes.db')
     logger.info(f"Database path: {db_path}")
     return db_path
-
-def get_source_dir():
-    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def join_path(*args):
     return os.path.join(*args)
