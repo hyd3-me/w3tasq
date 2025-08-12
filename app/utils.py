@@ -35,7 +35,7 @@ def get_redis_pwd():
     return private_data.REDIS_PWD
 
 def get_redis_host():
-    return os.getenv('REDIS_HOST', 'host.docker.internal')
+    return os.getenv('REDIS_HOST', 'localhost')
 
 def get_redis_port():
     return int(os.getenv('REDIS_PORT', 6379))

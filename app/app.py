@@ -51,7 +51,7 @@ def create_app(config_name='default'):
     
     # Log application start
     root_logger.info(f"Starting w3tasq in {config_name} mode")
-    #app_logger.debug(f"db_path: {app.config.get('SQLALCHEMY_DATABASE_URI')}")
+    app_logger.debug(f"db_path: {app.config.get('SQLALCHEMY_DATABASE_URI')}")
 
     # Register custom filters
     app.jinja_env.filters['shorten_wallet'] = shorten_wallet_address
@@ -319,7 +319,7 @@ def create_app(config_name='default'):
     
     return app
 
-app = create_app(config_name=FLASK_ENV)
+# app = create_app(config_name=FLASK_ENV)
 
 # For running in production
 if __name__ == '__main__':
