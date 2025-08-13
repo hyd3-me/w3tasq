@@ -313,6 +313,38 @@ class TestTaskModel:
             # updated_at should have been updated
             assert task_from_db.updated_at > task_from_db.created_at # This depends on datetime precision and might be flaky in tests
     
+    def test_update_task_status_completed_increments_counter(self, app, user1, task1):
+        with app.app_context():
+
+            # --- Setup: Get the initial status of the task ---
+            initial_status = task1.status
+            task_id = task1.id
+            user_id = user1.id
+
+            # Ensure the task is not already archived for a meaningful test
+            assert initial_status != TaskStatus.ARCHIVED, "Task should not start as archived"
+
+            # --- Action: Archive the task ---
+            # Use the existing authorization and update logic
+            authorized_result, message = db_utils.is_user_authorized_for_task(user_id, task_id)
+            
+            assert authorized_result, "User should be authorized to archive their own task"
+            task_instance = authorized_result # authorized_result is the Task instance
+            # not completed tasks
+            assert user1.completed_tasks == 0
+            # Update the task status to COMPLETED (1)
+            success, message = db_utils.update_task_status_internal(task_instance, TaskStatus.COMPLETED)
+
+            # --- Verification: Ensure the operation was successful ---
+            assert success is True, f"Complited task should succeed. Message: {message}"
+            assert message == "Task status updated successfully"
+            task_from_db, msg = db_utils.get_task_by_id(task_id)
+            assert task_from_db is not None, "Task should still exist in DB after archiving"
+            assert task_from_db.status == TaskStatus.COMPLETED, f"Task status in DB should be {TaskStatus.COMPLETED} (COMPLETED)"
+            #getuser
+            user_from_db, was_created = db_utils.get_user_by_id(user1.id)
+            assert user_from_db.completed_tasks == 1
+    
     def test_get_user_tasks_cursor_filters_by_active_status(self, app):
         """
         Test that get_user_tasks_cursor only returns tasks with status=0 (ACTIVE).

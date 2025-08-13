@@ -27,6 +27,22 @@ def get_or_create_user(wallet_address):
     db.session.commit()
     return user, True  # True means user was created
 
+def get_user_by_id(user_id):
+    try:
+        # Query the database for the user with the given ID
+        _user = User.query.filter_by(id=user_id).first()
+        
+        if _user:
+            return _user, "User found"
+        else:
+            return None, "User not found"
+            
+    except Exception as e:
+        # In case of any unexpected database error
+        # Logging the error might be useful in production.
+        logger.error(f"get_user_by_id: {e}")
+        return None, "Error retrieving user"
+
 def create_task(user_id, title, description=None, priority=3, status=0):
     """
     Create a new task for a user.
@@ -191,6 +207,15 @@ def is_user_authorized_for_task(user_id, task_id):
         # print(f"Error checking authorization for task {task_id} by user {user_id}: {e}")
         return False, "Error checking authorization"
 
+def complete_task_plus(user_id):
+    user, msg = get_user_by_id(user_id)
+    if user is None:
+        return user, msg
+    user.completed_tasks += 1
+    db.session.add(user)
+    db.session.commit()
+    return True, f'updated'
+
 # --- NEW FUNCTION: Update the status of a task ---
 def update_task_status_internal(task_instance, new_status):
     """
@@ -224,6 +249,10 @@ def update_task_status_internal(task_instance, new_status):
 
         # 2. Update the task instance
         # Update the status field
+        old_status = task_instance.status
+        if old_status == 0 and new_status == 1:
+            task_instance.user.completed_tasks += 1
+            # complete_task_plus(task_instance.user.id)
         task_instance.status = new_status
         # SQLAlchemy will automatically update the updated_at field on commit,
         # if it has default=datetime.utcnow or server_default.
@@ -241,7 +270,8 @@ def update_task_status_internal(task_instance, new_status):
         return True, "Task status updated successfully"
         
     except Exception as e:
+        _err_msg = "Error updating task status"
         # 5. Rollback on error and return failure
-        # print(f"Error updating task status: {e}") # For debugging
+        logger.error(f"{_err_msg}: {e}")
         db.session.rollback()
-        return False, "Error updating task status"
+        return False, _err_msg

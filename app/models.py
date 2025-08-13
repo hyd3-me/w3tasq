@@ -49,6 +49,7 @@ class User(db.Model):
     
     # Relationships
     tasks = db.relationship('Task', backref='user', lazy=True, cascade='all, delete-orphan')
+    completed_tasks = db.Column(db.Integer, default=0)
     
     def __repr__(self):
         """String representation of User instance."""
