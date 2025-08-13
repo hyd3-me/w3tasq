@@ -6,7 +6,7 @@ services:
     volumes:
       - .:/source
       - ../db/tasks_notes.db:/db/tasks_notes.db
-      - ../private_data.py:/private_data.py
+      - ../private_data.py:/private_data.py:ro
     environment:
       - FLASK_ENV=development
       - REDIS_HOST=host.docker.internal
