@@ -4,7 +4,7 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ../tasks_notes.db:/db/tasks_notes.db
+      - ../db/tasks_notes.db:/db/tasks_notes.db
       - ../private_data.py:/private_data.py
     environment:
       - FLASK_ENV=production

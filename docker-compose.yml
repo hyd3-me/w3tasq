@@ -4,8 +4,8 @@ services:
     ports:
       - "127.0.0.1:5000:5000"
     volumes:
-      - ../tasks_notes.db:/source/db/tasks_notes.db
-      - ../private_data.py:/source/private_data.py
+      - ../db/tasks_notes.db:/db/tasks_notes.db
+      - ../private_data.py:/private_data.py
     environment:
       - FLASK_ENV=production
       - REDIS_HOST=host.docker.internal
