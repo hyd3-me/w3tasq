@@ -382,6 +382,7 @@ body {
   margin: 10px 0;
   padding-left: 10px;
   white-space: pre-wrap;
+  overflow: clip;
 }
 
 /* Task archive button */
