@@ -112,7 +112,7 @@ This project is in active development and deployed in production.
   - `PATCH /api/tasks/<task_id>`: Update task status (requires authentication).
   Example:
   ```bash
-  curl -X PATCH -H "Content-Type: application/json" -d '{"status": 1}' https://w3tasq.1384139-cx33953.tw1.ru/api/tasks/123
+  curl -X PATCH -H "Content-Type: application/json" -d '{"status": 1}' https://tasq.w3.tw1.su/api/tasks/123
   ```
 
 ## Development
